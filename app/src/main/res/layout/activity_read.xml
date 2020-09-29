@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:layout_below="@+id/toolbar">
+
+
+            <ImageView
+                android:id="@+id/photo"
+                android:layout_width="360dp"
+                android:layout_height="360dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="360dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/photo"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:text="제목입니다."
+                android:textSize="20dp"
+                android:textColor="#000"/>
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="360dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#000"
+                android:text="안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.ㅁㄴㅇㄹㄴㅇㅎㄴㅇㅎㅁㄴㅇㅎㄴㅁㅇㅎㅁㄴㅇㅎㅇㄶㅁㄴㅇㅎㄴㅇㅎㅁㄴㅇ" />
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="360dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#000"
+                android:text="안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.ㅁㄴㅇㄹㄴㅇㅎㄴㅇㅎㅁㄴㅇㅎㄴㅁㅇㅎㅁㄴㅇㅎㅇㄶㅁㄴㅇㅎㄴㅇㅎㅁㄴㅇ" />
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="360dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text1"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#000"
+                android:text="안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.안녕하세요.ㅁㄴㅇㄹㄴㅇㅎㄴㅇㅎㅁㄴㅇㅎㄴㅁㅇㅎㅁㄴㅇㅎㅇㄶㅁㄴㅇㅎㄴㅇㅎㅁㄴㅇ" />
+
+
+        </RelativeLayout>
+
+
+    </ScrollView>
+
+</LinearLayout>
