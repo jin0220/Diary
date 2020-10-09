@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,13 +36,12 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     //요청코드
     int GET_GALLERY_IMAGE = 200;
     int GET_CAPTURE_IMAGE = 201;
-//    static final int REQUEST_TAKE_PHOTO = 1;
 
     Button gallery, camera;
     ImageView[] imageViews = new ImageView[10];
     int[] imageViewId = {R.id.photo1, R.id.photo2, R.id.photo3, R.id.photo4, R.id.photo5, R.id.photo6, R.id.photo7, R.id.photo8, R.id.photo9, R.id.photo10};
     ArrayList<Uri> imageUris;
-    File file;
+    Uri photoURI;
     String currentPhotoPath;
 
 
@@ -51,11 +51,6 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         setContentView(R.layout.activity_write);
 
         AutoPermissions.Companion.loadAllPermissions(this, 101); //권한
-
-        //SD 카드로 저장
-//        File sdcard =  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-//        String imageFileName = "capture.jpg";
-//        file = new File(sdcard, imageFileName);
 
         for(int i = 0; i < 10; i++) {
             imageViews[i] = findViewById(imageViewId[i]);
@@ -89,17 +84,9 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 //                    if (intent.resolveActivity(getPackageManager()) != null) {
 //                        startActivityForResult(intent, GET_CAPTURE_IMAGE);
 //                    }
-                Log.d("확인","1");
                 dispatchTakePictureIntent();
             }
         });
-
-//        if(Build.VERSION.SDK_INT < 24){
-//            Toast.makeText(this,"24미만",Toast.LENGTH_LONG).show();
-//        }
-//        else{
-//            Toast.makeText(this,"24이상",Toast.LENGTH_LONG).show();
-//        }
 
     }
 
@@ -116,8 +103,11 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 storageDir      /* directory */
         );
 
+        Log.d("확인",storageDir.toString());
+//        File image1 = new File("/sdcard/DCIM/Camera/" + imageFileName + ".jpg");
         // Save a file: path for use with ACTION_VIEW intents 파일저장
         currentPhotoPath = image.getAbsolutePath();
+        Log.d("확인",currentPhotoPath);
         return image;
     }
 
@@ -141,9 +131,11 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 }
                 // Continue only if the File was successfully created 파일이 생성된 경우 실행
                 if (photoFile != null) {
-                    Log.d("확인","3");
-                    Uri photoURI = FileProvider.getUriForFile(this, getPackageName(), photoFile); //왜 안되냐고.....
-
+                    try {
+                        photoURI = FileProvider.getUriForFile(WriteActivity.this, "com.example.diary", photoFile);
+                    }catch (IllegalArgumentException e){
+                        Toast.makeText(this, "예외2",Toast.LENGTH_LONG).show();
+                    }
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                     startActivityForResult(takePictureIntent, GET_CAPTURE_IMAGE);
                 }
@@ -153,7 +145,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 //갤러리에 사진 추가
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath);
+        File f = new File(currentPhotoPath); //
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
@@ -182,9 +174,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                         Uri imageUri = data.getClipData().getItemAt(i).getUri();
                         imageUris.add(imageUri);
                         imageViews[i].setImageURI(imageUris.get(i));
-//                    Toast.makeText(this,imageViews[i].toString(),Toast.LENGTH_LONG).show();
                     }
-//                    textView.append("#2" + imageUris + "\r\n");
                 }
             }
             else{
@@ -197,21 +187,15 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         }
         //사진 촬영
         else if(requestCode == GET_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK){
-            /* 이미지 파일의 용량이 너무 커서 그대로 앱에 띄울 경우
-             * 메모리 부족으로 비정상 종료될 수 있으므로 크기를 줄여 비트맵으로 로딩한 후 설정 */
-
             galleryAddPic();
 
+            /* 이미지 파일의 용량이 너무 커서 그대로 앱에 띄울 경우
+             * 메모리 부족으로 비정상 종료될 수 있으므로 크기를 줄여 비트맵으로 로딩한 후 설정 */
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 8; // 1/8 로 크기를 줄임
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
             imageViews[0].setImageBitmap(bitmap);
 
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//            imageViews[0].setImageBitmap(imageBitmap);
-
-//            imageViews[0].setImageURI(data.getData());
         }
 
     }
