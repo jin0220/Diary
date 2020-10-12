@@ -16,11 +16,12 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
-
+//테이블 생성
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = "create table if not exists " + TABLE_NAME + "("
                 + "_id integer PRIMARY KEY autoincrement, "
+                + "date DATE, "
                 + "title TEXT, "
                 + "image STRING, "
                 + "content TEXT)";

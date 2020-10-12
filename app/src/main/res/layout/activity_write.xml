@@ -135,6 +135,7 @@
                     android:textColor="@color/colorPrimary" />
 
                 <Button
+                    android:id="@+id/store"
                     android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"

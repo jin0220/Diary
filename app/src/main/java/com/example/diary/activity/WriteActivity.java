@@ -1,7 +1,9 @@
 package com.example.diary.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Picture;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.diary.R;
+import com.example.diary.data.DiaryDBHelper;
 import com.pedro.library.AutoPermissions;
 import com.pedro.library.AutoPermissionsListener;
 
@@ -37,12 +41,16 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     int GET_GALLERY_IMAGE = 200;
     int GET_CAPTURE_IMAGE = 201;
 
-    Button gallery, camera;
+    TextView title, content;
+    Button gallery, camera, store;
     ImageView[] imageViews = new ImageView[10];
     int[] imageViewId = {R.id.photo1, R.id.photo2, R.id.photo3, R.id.photo4, R.id.photo5, R.id.photo6, R.id.photo7, R.id.photo8, R.id.photo9, R.id.photo10};
     ArrayList<Uri> imageUris;
     Uri photoURI;
     String currentPhotoPath;
+
+    DiaryDBHelper diaryDBHelper;
+    SQLiteDatabase sqLiteDatabase;
 
 
     @Override
@@ -52,18 +60,18 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
         AutoPermissions.Companion.loadAllPermissions(this, 101); //권한
 
+        diaryDBHelper = new DiaryDBHelper(this);
+        sqLiteDatabase = diaryDBHelper.getWritableDatabase();
+
         for(int i = 0; i < 10; i++) {
             imageViews[i] = findViewById(imageViewId[i]);
         }
         gallery = findViewById(R.id.gallery);
 
-//        imageUris =  new ArrayList<>();
         //갤러리에서 이미지 가져오기
         gallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                imageUris =  new ArrayList<>();
-//                textView.append("#1" + imageUris + "\r\n");
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); //이미지 여러장 선택
@@ -85,6 +93,37 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 //                        startActivityForResult(intent, GET_CAPTURE_IMAGE);
 //                    }
                 dispatchTakePictureIntent();
+            }
+        });
+
+        title = findViewById(R.id.title);
+        content = findViewById(R.id.content);
+
+        store = findViewById(R.id.store);
+
+
+        store.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Log.d("확인", "실행");
+                String t = title.getText().toString();
+                String i = imageUris.get(0).toString();
+                String c = content.getText().toString();
+                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+//                Log.d("확인","title : "+t);
+//                Log.d("확인","content : "+c);
+//                Log.d("확인","image : "+i);
+//                Log.d("확인","date : "+date);
+
+                ContentValues values = new ContentValues();
+                values.put("title", t);
+                values.put("image", i);
+                values.put("content", c);
+                values.put("date", date);
+
+// Insert the new row, returning the primary key value of the new row
+                long newRowId = sqLiteDatabase.insert(DiaryDBHelper.TABLE_NAME, null, values);
+//                Log.d("확인","newRowId: " + newRowId);
             }
         });
 
@@ -174,6 +213,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                         Uri imageUri = data.getClipData().getItemAt(i).getUri();
                         imageUris.add(imageUri);
                         imageViews[i].setImageURI(imageUris.get(i));
+                        Log.d("확인","이미지: " + i + "->" + imageUris.get(i));
                     }
                 }
             }
