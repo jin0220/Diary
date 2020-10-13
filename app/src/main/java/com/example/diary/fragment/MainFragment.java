@@ -1,7 +1,11 @@
 package com.example.diary.fragment;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.provider.BaseColumns;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +14,7 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ComponentActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -17,6 +22,8 @@ import com.example.diary.adapter.MainGridAdapter;
 import com.example.diary.R;
 import com.example.diary.activity.ReadActivity;
 import com.example.diary.activity.WriteActivity;
+import com.example.diary.data.DiaryDBHelper;
+import com.example.diary.data.MainGridData;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainFragment extends Fragment {
@@ -24,6 +31,8 @@ public class MainFragment extends Fragment {
     GridView gridView;
     MainGridAdapter adapter;
     FloatingActionButton btn_write;
+    DiaryDBHelper diaryDBHelper;
+
 
     @Nullable
     @Override
@@ -31,6 +40,7 @@ public class MainFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.main_fragment,container,false);
 
         adapter = new MainGridAdapter();
+        diaryDBHelper = new DiaryDBHelper(getContext());
 
 
         gridView = rootView.findViewById(R.id.gridView);
@@ -38,23 +48,36 @@ public class MainFragment extends Fragment {
         gridView.setAdapter(adapter);
 
 
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
-        adapter.addData("Aug. 16",ContextCompat.getDrawable(getActivity(),R.drawable.button));
+        //데이터 조회
+        Cursor cursor = diaryDBHelper.select();
+
+        while (cursor.moveToNext()) {
+            String image = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
+            String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
+            Log.d("확인","image : "+ image);
+            Log.d("확인","date : "+ date);
+
+            adapter.addData(date,ContextCompat.getDrawable(getActivity(),R.drawable.button));
+        }
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Log.d("확인","실행 1");
                 Intent intent =  new Intent(getActivity().getApplicationContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
+//                Log.d("확인","실행 2");
+                MainGridData date = (MainGridData) adapter.getItem(i);
+//                Log.d("확인",  item.getText()); //날짜
+//                String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + i;
+//                Cursor cursor = diaryDBHelper.getReadableDatabase().rawQuery();
+//                Log.d("확인","실행 3 : "+ da);
+                intent.putExtra("date", date.getText());
+                Log.d("확인","실행 4");
                 startActivity(intent);
             }
         });
+
+        cursor.close();
 
         btn_write = rootView.findViewById(R.id.floatingActionButton);
         btn_write.setOnClickListener(new View.OnClickListener() {

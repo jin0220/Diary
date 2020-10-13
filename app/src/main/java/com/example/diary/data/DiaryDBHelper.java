@@ -1,6 +1,8 @@
 package com.example.diary.data;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -12,6 +14,17 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
     public static int VERSION = 1; //데이터베이스 버전
     public static String TABLE_NAME = "diary_table";
 
+    //속성명
+    public static String _ID = "_id";
+    public static String DATE = "date";
+    public static String TITLE = "title";
+    public static String IMAGE = "image";
+    public static String CONTENT = "content";
+
+
+    DiaryDBHelper diaryDBHelper;
+    SQLiteDatabase sqLiteDatabase;
+
     public DiaryDBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
@@ -20,11 +33,11 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = "create table if not exists " + TABLE_NAME + "("
-                + "_id integer PRIMARY KEY autoincrement, "
-                + "date DATE, "
-                + "title TEXT, "
-                + "image STRING, "
-                + "content TEXT)";
+                + _ID + " integer PRIMARY KEY autoincrement, "
+                +  DATE  +" DATE, "
+                + TITLE + " TEXT, "
+                + IMAGE + " STRING, "
+                + CONTENT + " TEXT)";
 
         try {
             sqLiteDatabase.execSQL(sql);
@@ -45,6 +58,70 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
                 Log.e("Database","Exception in  UPGRADE_SQL", e);
             }
         }
+    }
+
+    public void insert(String t, String i, String c, String date){
+        sqLiteDatabase = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(TITLE, t);
+        values.put(IMAGE, i);
+        values.put(CONTENT, c);
+        values.put(DATE, date);
+
+        sqLiteDatabase.insert(DiaryDBHelper.TABLE_NAME, null, values); //레코드 삽입
+    }
+
+    public Cursor select(){
+        sqLiteDatabase = getReadableDatabase(); //데이터 읽어 오기
+
+        String[] projection = {
+                _ID,
+                DATE,
+                TITLE,
+                IMAGE,
+                CONTENT
+        };
+
+        String sortOrder = DATE + " DESC";
+
+        Cursor cursor = sqLiteDatabase.query(
+                TABLE_NAME,   // The table to query
+                projection,             // 값을 가져올 column name의 배열
+                null,              // where 문에 필요한 column
+                null,          // where 문에 필요한 value
+                null,                   // group by를 적용할 column
+                null,                   // having 절
+                sortOrder               // 정렬 방식
+        );
+
+//        String[] columnName = {
+//                _ID,
+//                DATE,
+//                TITLE,
+//                IMAGE,
+//                CONTENT
+//        };
+//
+//        String[] returnValue = new String[columnName.length];
+//
+//        while (cursor.moveToNext()){
+//
+//        }
+
+        return  cursor;
+    }
+
+    public Cursor read(String date){
+        Log.d("확인", "데이터 들어옴");
+        sqLiteDatabase = getReadableDatabase();
+
+        String sql = "select * from "+ TABLE_NAME + " where date = " + "'" + date + "'";
+        Log.d("확인", sql);
+        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+
+        Log.d("확인", "데이터 나감");
+        return cursor;
     }
 
         /*

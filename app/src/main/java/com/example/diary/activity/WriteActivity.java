@@ -50,7 +50,6 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     String currentPhotoPath;
 
     DiaryDBHelper diaryDBHelper;
-    SQLiteDatabase sqLiteDatabase;
 
 
     @Override
@@ -61,7 +60,6 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         AutoPermissions.Companion.loadAllPermissions(this, 101); //권한
 
         diaryDBHelper = new DiaryDBHelper(this);
-        sqLiteDatabase = diaryDBHelper.getWritableDatabase();
 
         for(int i = 0; i < 10; i++) {
             imageViews[i] = findViewById(imageViewId[i]);
@@ -105,25 +103,12 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         store.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Log.d("확인", "실행");
                 String t = title.getText().toString();
                 String i = imageUris.get(0).toString();
                 String c = content.getText().toString();
                 String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
-//                Log.d("확인","title : "+t);
-//                Log.d("확인","content : "+c);
-//                Log.d("확인","image : "+i);
-//                Log.d("확인","date : "+date);
 
-                ContentValues values = new ContentValues();
-                values.put("title", t);
-                values.put("image", i);
-                values.put("content", c);
-                values.put("date", date);
-
-// Insert the new row, returning the primary key value of the new row
-                long newRowId = sqLiteDatabase.insert(DiaryDBHelper.TABLE_NAME, null, values);
-//                Log.d("확인","newRowId: " + newRowId);
+                diaryDBHelper.insert(t, i, c, date);
             }
         });
 
