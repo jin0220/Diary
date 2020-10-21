@@ -22,7 +22,6 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
     public static String CONTENT = "content";
 
 
-    DiaryDBHelper diaryDBHelper;
     SQLiteDatabase sqLiteDatabase;
 
     public DiaryDBHelper(Context context) {
@@ -36,7 +35,7 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
                 + _ID + " integer PRIMARY KEY autoincrement, "
                 +  DATE  +" DATE, "
                 + TITLE + " TEXT, "
-                + IMAGE + " STRING, "
+                + IMAGE + " TEXT, "
                 + CONTENT + " TEXT)";
 
         try {
@@ -95,32 +94,16 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
                 sortOrder               // 정렬 방식
         );
 
-//        String[] columnName = {
-//                _ID,
-//                DATE,
-//                TITLE,
-//                IMAGE,
-//                CONTENT
-//        };
-//
-//        String[] returnValue = new String[columnName.length];
-//
-//        while (cursor.moveToNext()){
-//
-//        }
-
         return  cursor;
     }
 
     public Cursor read(String date){
-        Log.d("확인", "데이터 들어옴");
         sqLiteDatabase = getReadableDatabase();
 
         String sql = "select * from "+ TABLE_NAME + " where date = " + "'" + date + "'";
         Log.d("확인", sql);
         Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
 
-        Log.d("확인", "데이터 나감");
         return cursor;
     }
 

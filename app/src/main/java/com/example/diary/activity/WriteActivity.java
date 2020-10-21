@@ -3,10 +3,12 @@ package com.example.diary.activity;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Picture;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,11 +30,13 @@ import com.example.diary.data.DiaryDBHelper;
 import com.pedro.library.AutoPermissions;
 import com.pedro.library.AutoPermissionsListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Stream;
 
 
 public class WriteActivity extends AppCompatActivity implements AutoPermissionsListener {
@@ -104,14 +108,59 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             @Override
             public void onClick(View view) {
                 String t = title.getText().toString();
-                String i = imageUris.get(0).toString();
+                String i = imageUris.get(0).toString(); //수정
+//                byte[] i = imageViewToByte(imageViews[0]);
+                String imagePath = uri_path(imageUris.get(0));
                 String c = content.getText().toString();
                 String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
 
-                diaryDBHelper.insert(t, i, c, date);
+                Log.d("확인","데이터 삽입 : "+ imagePath);
+
+                diaryDBHelper.insert(t, imagePath, c, date);
+                Log.d("확인","데이터 삽입 성공");
             }
         });
 
+    }
+//uri를 path로 바꾸기
+    private String uri_path(Uri uri) {
+
+        String id = uri.getLastPathSegment().split(":")[1];
+        final String[] imageColumns = {MediaStore.Images.Media.DATA };
+        final String imageOrderBy = null;
+
+        Uri uriImage = getUri();
+        String selectedImagePath = "path";
+
+        Cursor imageCursor = getContentResolver().query(uriImage, imageColumns,
+                MediaStore.Images.Media._ID + "="+id, null, imageOrderBy);
+
+        if (imageCursor.moveToFirst()) {
+            selectedImagePath = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        }
+        Log.e("path",selectedImagePath ); // use selectedImagePath
+
+        imageCursor.close();
+        Log.d("확인","실행 6 : " + selectedImagePath);
+        return selectedImagePath;
+    }
+
+
+    private Uri getUri() {
+        String state = Environment.getExternalStorageState();
+        if(!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
+            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+
+        return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+    }
+
+    //이미지뷰에 올라온 사진을 바이드단위로 바꿔줌
+    private byte[] imageViewToByte(ImageView imageView) {
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,70,stream); //70% 압축
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
     }
 
 
@@ -120,7 +169,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         // Create an image file name 이미지 파일 이름
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
@@ -205,6 +254,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             else{
                 //한장
                 Uri imageUri = data.getData();
+                Log.d("확인", "uri : " + imageUri);
                 imageUris.add(imageUri);
                 imageViews[0].setImageURI(imageUris.get(0));
             }

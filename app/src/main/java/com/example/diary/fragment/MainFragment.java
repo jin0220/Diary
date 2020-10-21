@@ -1,10 +1,14 @@
 package com.example.diary.fragment;
 
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteBlobTooBigException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,34 +41,32 @@ public class MainFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.main_fragment,container,false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.main_fragment, container, false);
 
         adapter = new MainGridAdapter();
         diaryDBHelper = new DiaryDBHelper(getContext());
-
 
         gridView = rootView.findViewById(R.id.gridView);
 
         gridView.setAdapter(adapter);
 
-
         //데이터 조회
         Cursor cursor = diaryDBHelper.select();
+
 
         while (cursor.moveToNext()) {
             String image = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
-            Log.d("확인","image : "+ image);
-            Log.d("확인","date : "+ date);
-
-            adapter.addData(date,ContextCompat.getDrawable(getActivity(),R.drawable.button));
+            Uri uriImage = getUriFromPath(image);
+            adapter.addData(date, uriImage);
         }
+
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 //                Log.d("확인","실행 1");
-                Intent intent =  new Intent(getActivity().getApplicationContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
+                Intent intent = new Intent(getActivity().getApplicationContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
 //                Log.d("확인","실행 2");
                 MainGridData date = (MainGridData) adapter.getItem(i);
 //                Log.d("확인",  item.getText()); //날짜
@@ -72,7 +74,6 @@ public class MainFragment extends Fragment {
 //                Cursor cursor = diaryDBHelper.getReadableDatabase().rawQuery();
 //                Log.d("확인","실행 3 : "+ da);
                 intent.putExtra("date", date.getText());
-                Log.d("확인","실행 4");
                 startActivity(intent);
             }
         });
@@ -88,6 +89,18 @@ public class MainFragment extends Fragment {
             }
         });
 
-        return  rootView;
+        return rootView;
+    }
+
+    //path를 uri로 바꾸기
+    public Uri getUriFromPath(String filePath) {
+        Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null, "_data = '" + filePath + "'", null, null);
+
+        cursor.moveToNext();
+        int id = cursor.getInt(cursor.getColumnIndex("_id"));
+        Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+
+        return uri;
     }
 }
