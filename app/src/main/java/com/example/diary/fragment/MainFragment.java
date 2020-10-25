@@ -3,13 +3,9 @@ package com.example.diary.fragment;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteBlobTooBigException;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +14,12 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ComponentActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.diary.adapter.MainGridAdapter;
 import com.example.diary.R;
 import com.example.diary.activity.ReadActivity;
 import com.example.diary.activity.WriteActivity;
+import com.example.diary.adapter.MainGridAdapter;
 import com.example.diary.data.DiaryDBHelper;
 import com.example.diary.data.MainGridData;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -68,12 +62,13 @@ public class MainFragment extends Fragment {
 //                Log.d("확인","실행 1");
                 Intent intent = new Intent(getActivity().getApplicationContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
 //                Log.d("확인","실행 2");
-                MainGridData date = (MainGridData) adapter.getItem(i);
+                MainGridData data = (MainGridData) adapter.getItem(i);
 //                Log.d("확인",  item.getText()); //날짜
 //                String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + i;
 //                Cursor cursor = diaryDBHelper.getReadableDatabase().rawQuery();
 //                Log.d("확인","실행 3 : "+ da);
-                intent.putExtra("date", date.getText());
+                intent.putExtra("date", data.getText());
+//                intent.putExtra("image", data.getImage().toString());
                 startActivity(intent);
             }
         });

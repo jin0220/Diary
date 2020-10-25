@@ -107,6 +107,10 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Boolean delete(String id){
+        return sqLiteDatabase.delete(TABLE_NAME, "_id = " + id, null) > 0;
+    }
+
         /*
         public void open(){
             DatabaseHelper databaseHelper = new DatabaseHelper(this, DATABASE_NAME, null, VERSION);

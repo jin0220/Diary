@@ -3,36 +3,29 @@ package com.example.diary.activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 
 import com.example.diary.R;
 import com.example.diary.data.DiaryDBHelper;
-
-import java.io.File;
-import java.io.InputStream;
 
 public class ReadActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     DiaryDBHelper diaryDBHelper;
-    String date;
+    String date, image;
     TextView title, content;
     ImageView photo;
+    String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +46,14 @@ public class ReadActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         date = intent.getExtras().getString("date");
+//        image = intent.getExtras().getString("Image");
 
         Cursor cursor = diaryDBHelper.read(date);
         if(cursor.moveToNext()){
             String i = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
             String c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.CONTENT));
+            id = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper._ID));
 //            Log.d("확인","바꾸기 전");
 //            Uri uri = new Uri.Builder().build().parse(i);
 //            InputStream in = getContentResolver().openInputStream(uri);
@@ -77,7 +72,7 @@ public class ReadActivity extends AppCompatActivity {
 
 //            Bitmap bitmap = BitmapFactory.decodeByteArray(i, 0, i.length);
             Uri uriImage = getUriFromPath(i);
-            Log.d("확인", "uriImage : " + uriImage);
+//            Log.d("확인", "uriImage : " + uriImage);
 ////            Uri photoUri = Uri.fromFile();
             photo.setImageURI(uriImage);
 
@@ -89,6 +84,8 @@ public class ReadActivity extends AppCompatActivity {
         }
 
         cursor.close();
+
+
 
     }
 
@@ -118,6 +115,9 @@ public class ReadActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.delete:
+                diaryDBHelper.delete(id);
                 return true;
         }
         return super.onOptionsItemSelected(item);
