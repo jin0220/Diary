@@ -101,10 +101,28 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         sqLiteDatabase = getReadableDatabase();
 
         String sql = "select * from "+ TABLE_NAME + " where date = " + "'" + date + "'";
-        Log.d("확인", sql);
+//        Log.d("확인", sql);
         Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
 
         return cursor;
+    }
+
+    public  Cursor select_sql(String sql){
+        sqLiteDatabase = getReadableDatabase();
+
+        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+
+        return cursor;
+    }
+
+    public boolean update(String id, String t, String i, String c , String date){
+        ContentValues values = new ContentValues();
+        values.put(_ID, id);
+        values.put(TITLE, t);
+        values.put(IMAGE, i);
+        values.put(CONTENT, c);
+        values.put(DATE, date);
+        return sqLiteDatabase.update(TABLE_NAME, values, "_id=" + id, null) > 0;
     }
 
     public Boolean delete(String id){

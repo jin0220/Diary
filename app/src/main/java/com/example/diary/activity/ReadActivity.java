@@ -85,7 +85,25 @@ public class ReadActivity extends AppCompatActivity {
 
         cursor.close();
 
-
+//        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+//
+//        Cursor cursor_spinner = diaryDBHelper.select();
+//
+//        while(cursor_spinner.moveToNext()){
+//            String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
+////            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, date);
+//        }
+//
+//
+//// Create an ArrayAdapter using the string array and a default spinner layout
+//        String[] planets_array = {"2020-10-27","2020-10-28"};
+////        ArrayAdapter<String> adapter = ArrayAdapter.createFromResource(this,
+////                planets_array, android.R.layout.simple_spinner_item);
+//
+//// Specify the layout to use when the list of choices appears
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//// Apply the adapter to the spinner
+//        spinner.setAdapter(adapter);
 
     }
 
@@ -119,6 +137,12 @@ public class ReadActivity extends AppCompatActivity {
             case R.id.delete:
                 diaryDBHelper.delete(id);
                 return true;
+            case R.id.modify:
+                Intent intent = new Intent(this, WriteActivity.class);
+                intent.putExtra("modify",true);
+                intent.putExtra("id",id);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

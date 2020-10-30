@@ -10,14 +10,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.example.diary.fragment.MainFragment;
 import com.example.diary.R;
+import com.example.diary.fragment.MainFragment;
+import com.example.diary.fragment.SettingFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MainFragment mainFragment;
+    SettingFragment settingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mainFragment = new MainFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.container,mainFragment).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.container,mainFragment).commit(); //프래그먼트 생성
 
     }
 
@@ -87,11 +89,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, mainFragment).commit();
         } else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.nav_slideshow) {
-
+        } else if (id == R.id.nav_setting) {
+            settingFragment = new SettingFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, settingFragment).commit(); //프래그먼트 교체
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

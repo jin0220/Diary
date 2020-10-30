@@ -1,13 +1,11 @@
 package com.example.diary.activity;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Picture;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,7 +34,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.stream.Stream;
 
 
 public class WriteActivity extends AppCompatActivity implements AutoPermissionsListener {
@@ -50,8 +47,13 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     ImageView[] imageViews = new ImageView[10];
     int[] imageViewId = {R.id.photo1, R.id.photo2, R.id.photo3, R.id.photo4, R.id.photo5, R.id.photo6, R.id.photo7, R.id.photo8, R.id.photo9, R.id.photo10};
     ArrayList<Uri> imageUris;
+//    ArrayList <Uri> modi_uris;
     Uri photoURI;
     String currentPhotoPath;
+    String id;
+    boolean modify = false;
+    int store_state = 0;
+    int image_ch = 0;
 
     DiaryDBHelper diaryDBHelper;
 
@@ -107,21 +109,77 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         store.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d("확인", "데이터 가져오기");
                 String t = title.getText().toString();
-                String i = imageUris.get(0).toString(); //수정
+//                Log.d("확인", "데이터 가져오기1");
+//                String i = imageUris.get(0).toString();
+//                Log.d("확인", "데이터 가져오기2");
 //                byte[] i = imageViewToByte(imageViews[0]);
                 String imagePath = uri_path(imageUris.get(0));
+                Log.d("확인", "데이터 가져오기3");
                 String c = content.getText().toString();
+                Log.d("확인", "데이터 가져오기4");
                 String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+                Log.d("확인", "데이터 가져오기5");
 
-                Log.d("확인","데이터 삽입 : "+ imagePath);
+//                Log.d("확인", "데이터 삽입 : " + imagePath);
 
-                diaryDBHelper.insert(t, imagePath, c, date);
-                Log.d("확인","데이터 삽입 성공");
+                Log.d("확인", "store_state: " + store_state);
+//                Toast.makeText(getApplicationContext(),"modify: " + modify, Toast.LENGTH_LONG).show();
+
+                //사진을 바꾸지 않을 경우 오류
+                if(store_state == 0) {
+//                    String imagePath = uri_path(imageUris.get(0));
+                    diaryDBHelper.insert(t, imagePath, c, date);
+
+                }
+                else{
+//                    String imagePath;
+//                    if(image_ch == 0){
+//                        imagePath = uri_path(imageUris.get(0));
+//                    }else{
+//                        imagePath = uri_path(modi_uris.get(0));
+//                    }
+                    Log.d("확인", "데이터 수정 image_ch : " + image_ch);
+                    diaryDBHelper.update(id,t,imagePath,c,date);
+                    Log.d("확인", "데이터 삽입 성공");
+                }
             }
         });
 
+        //수정 (글쓰기 버튼을 누르면 오류가 남)
+//        Intent intent = getIntent();
+//        id = intent.getExtras().getString("id");
+//        modify = intent.getExtras().getBoolean("modify");
+
+//        //수정
+//        if(modify == true){
+//            store_state = 1;
+//            image_ch =1;
+//            Log.d("확인","수정 실행");
+//
+//            String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where _id = " + "'" + id + "'";
+//
+//            Cursor cursor = diaryDBHelper.select_sql(sql);
+//            if(cursor.moveToNext()) {
+//                String i = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
+//                String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
+//                String c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.CONTENT));
+//
+//                Uri uriImage = getUriFromPath(i);
+////                modi_uris = new ArrayList<>();
+////                modi_uris.add(uriImage);
+////                imageViews[0].setImageURI(modi_uris.get(0));
+//                imageViews[0].setImageURI(uriImage);
+//
+//
+//                title.setText(t);
+//                content.setText(c);
+//                Log.d("확인", "셋팅 성공");
+//            }
+//        }
     }
+
 //uri를 path로 바꾸기
     private String uri_path(Uri uri) {
 
@@ -227,6 +285,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        image_ch = 0;
         //갤러리에서 이미지 가져오기
         if (requestCode == GET_GALLERY_IMAGE && resultCode == Activity.RESULT_OK) {
             if(data.getClipData() != null || data.getData() != null){
@@ -272,7 +331,18 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             imageViews[0].setImageBitmap(bitmap);
 
         }
+    }
 
+    //path를 uri로 바꾸기
+    public Uri getUriFromPath(String filePath) {
+        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null, "_data = '" + filePath + "'", null, null);
+
+        cursor.moveToNext();
+        int id = cursor.getInt(cursor.getColumnIndex("_id"));
+        Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+
+        return uri;
     }
 
     @Override
