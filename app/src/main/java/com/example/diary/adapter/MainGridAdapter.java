@@ -3,7 +3,6 @@ package com.example.diary.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +113,6 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
         item.setImage(image);
 
         items.add(item);
-        Log.d("확인","어댑터 addData");
     }
 
 //    TextView textView;

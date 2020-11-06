@@ -1,5 +1,7 @@
 package com.example.diary.activity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,18 +14,37 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.diary.R;
 import com.example.diary.fragment.MainFragment;
-import com.example.diary.fragment.SettingFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MainFragment mainFragment;
-    SettingFragment settingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
+
+//        Log.d("확인","모드" + sharedPreferences.getBoolean("mode",false));
+        if(sharedPreferences.getBoolean("mode",false) == true){
+            setTheme(R.style.DarkTheme);
+//            Log.d("확인","모드1" + sharedPreferences.getBoolean("mode",false));
+        }else{
+            setTheme(R.style.AppTheme);
+//            Log.d("확인","모드2" + sharedPreferences.getBoolean("mode",false));
+        }
+//        Toast.makeText(this,"모드" + sharedPreferences.getBoolean("mode",false),Toast.LENGTH_LONG);
+//        //야간 모드
+//        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES){
+//            setTheme(R.style.DarkTheme);
+////            reStartApp();
+//        }
+//        else{
+//            setTheme(R.style.AppTheme);
+//        }
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,8 +67,13 @@ public class MainActivity extends AppCompatActivity
 
         mainFragment = new MainFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.container,mainFragment).commit(); //프래그먼트 생성
-
     }
+
+//    public void reStartApp(){
+//        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+//        startActivity(intent);
+//        finish();
+//    }
 
     @Override
     public void onBackPressed() {
@@ -93,8 +119,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_setting) {
-            settingFragment = new SettingFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, settingFragment).commit(); //프래그먼트 교체
+            Intent intent = new Intent(this,SettingsActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

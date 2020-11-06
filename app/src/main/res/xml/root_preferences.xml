@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="시스템 설정">
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="mode"
+            app:title="야간모드" />
+
+        <SwitchPreference
+            app:iconSpaceReserved="false"
+            app:key="alarm"
+            app:title="알람" />
+
+    </PreferenceCategory>
+
+
+    <Preference
+        app:iconSpaceReserved="false"
+        app:key="pw"
+        app:title="비밀번호 설정"
+        app:fragment="com.example.diary.fragment.pwPreferenceFragment"/>
+
+    <PreferenceScreen
+        app:iconSpaceReserved="false"
+        app:key="pdf"
+        app:title="PDF로 내보내기" />
+
+</PreferenceScreen>

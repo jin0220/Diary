@@ -2,6 +2,7 @@ package com.example.diary.activity;
 
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,18 @@ public class ReadActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
+
+//        Log.d("확인","모드" + sharedPreferences.getBoolean("mode",false));
+        if(sharedPreferences.getBoolean("mode",false) == true){
+            setTheme(R.style.DarkTheme);
+//            Log.d("확인","모드1" + sharedPreferences.getBoolean("mode",false));
+        }else{
+            setTheme(R.style.AppTheme);
+//            Log.d("확인","모드2" + sharedPreferences.getBoolean("mode",false));
+        }
+
         setContentView(R.layout.activity_read);
 
         toolbar = findViewById(R.id.toolbar);

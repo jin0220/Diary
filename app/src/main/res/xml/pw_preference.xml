@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="pw_category"
+        app:title="본인인증 수단">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="pw"
+            app:title="패스워드" >
+            <intent
+                android:targetPackage="com.example.diary"
+                android:targetClass="com.example.diary.activity.PasswordActivity"/>
+        </Preference>
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="bio"
+            app:title="지문" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

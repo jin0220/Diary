@@ -17,7 +17,11 @@
         android:roundIcon="@mipmap/ic_launcher_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!-- 파일 공유 설정 -->
+        <activity android:name=".activity.PasswordActivity"></activity>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.AppCompat.NoActionBar" /> <!-- 파일 공유 설정 -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.diary"
