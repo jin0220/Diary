@@ -39,7 +39,7 @@ public class ReadActivity extends AppCompatActivity {
             setTheme(R.style.DarkTheme);
 //            Log.d("확인","모드1" + sharedPreferences.getBoolean("mode",false));
         }else{
-            setTheme(R.style.AppTheme);
+            setTheme(R.style.LightTheme);
 //            Log.d("확인","모드2" + sharedPreferences.getBoolean("mode",false));
         }
 
@@ -118,6 +118,8 @@ public class ReadActivity extends AppCompatActivity {
 //// Apply the adapter to the spinner
 //        spinner.setAdapter(adapter);
 
+
+
     }
 
 //path를 uri로 바꾸기
@@ -140,15 +142,25 @@ public class ReadActivity extends AppCompatActivity {
 
         return true;
     }
-
+int count = 0;
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.favorite:
+                if(count == 0){
+                    item.setIcon(R.drawable.ic_favorite_press);
+                    count++;
+                }else{
+                    item.setIcon(R.drawable.ic_favorite);
+                    count--;
+                }
+                break;
             case R.id.delete:
                 diaryDBHelper.delete(id);
+                finish();
                 return true;
             case R.id.modify:
                 Intent intent = new Intent(this, WriteActivity.class);

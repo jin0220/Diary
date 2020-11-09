@@ -131,7 +131,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 if(store_state == 0) {
 //                    String imagePath = uri_path(imageUris.get(0));
                     diaryDBHelper.insert(t, imagePath, c, date);
-
+                    finish();
                 }
                 else{
 //                    String imagePath;
@@ -285,32 +285,31 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         image_ch = 0;
         //갤러리에서 이미지 가져오기
         if (requestCode == GET_GALLERY_IMAGE && resultCode == Activity.RESULT_OK) {
-            if(data.getClipData() != null || data.getData() != null){
-                imageUris =  new ArrayList<>(); //이미지 선택하면 객체 생성
-                for(int i = 0; i < 10; i++){
+            if (data.getClipData() != null || data.getData() != null) {
+                imageUris = new ArrayList<>(); //이미지 선택하면 객체 생성
+                for (int i = 0; i < 10; i++) {
                     imageViews[i].setImageResource(0); //이미지 선택하면 이전 이미지는 이미지뷰에서 리셋
                 }
             }
-            if(data.getClipData() != null){
+            if (data.getClipData() != null) {
                 //여러 장
                 int count = data.getClipData().getItemCount();
 
-                if(count > 10) {
+                if (count > 10) {
                     Toast.makeText(this, "사진은 10장까지 선택할 수 있습니다.", Toast.LENGTH_LONG).show();
-                }
-                else {
+                } else {
                     for (int i = 0; i < count; i++) {
                         Uri imageUri = data.getClipData().getItemAt(i).getUri();
                         imageUris.add(imageUri);
                         imageViews[i].setImageURI(imageUris.get(i));
-                        Log.d("확인","이미지: " + i + "->" + imageUris.get(i));
+                        Log.d("확인", "이미지: " + i + "->" + imageUris.get(i));
                     }
                 }
-            }
-            else{
+            } else {
                 //한장
                 Uri imageUri = data.getData();
                 Log.d("확인", "uri : " + imageUri);
@@ -320,7 +319,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
         }
         //사진 촬영
-        else if(requestCode == GET_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK){
+        else if (requestCode == GET_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK) {
             galleryAddPic();
 
             /* 이미지 파일의 용량이 너무 커서 그대로 앱에 띄울 경우

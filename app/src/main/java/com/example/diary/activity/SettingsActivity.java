@@ -29,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity implements PreferenceFra
             setTheme(R.style.DarkTheme);
 //            Log.d("확인","모드1" + sharedPreferences.getBoolean("mode",false));
         }else{
-            setTheme(R.style.AppTheme);
+            setTheme(R.style.LightTheme);
 //            Log.d("확인","모드2" + sharedPreferences.getBoolean("mode",false));
         }
 

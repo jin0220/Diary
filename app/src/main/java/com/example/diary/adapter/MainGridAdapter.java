@@ -22,7 +22,21 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
     TextView textView;
     ImageView imageView;
 
+    public static final int HEADER_VIEW = 0;
+    public static final int ITEM_VIEW = 1;
+
     ArrayList<MainGridData> items = new ArrayList<>();
+
+    public  class HeaderView extends MainGridAdapter.ViewHolder{
+
+        public HeaderView(View itemView) {
+            super(itemView);
+
+            textView = itemView.findViewById(R.id.date);
+
+        }
+    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
@@ -52,21 +66,6 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
                 }
             });
         }
-
-//        @Override
-//        public void onClick(View view) {
-//            onItem
-//                Intent intent = new Intent(this, ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
-////                Log.d("확인","실행 2");
-//                MainGridData data = (MainGridData) adapter.getItem(i);
-////                Log.d("확인",  item.getText()); //날짜
-////                String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + i;
-////                Cursor cursor = diaryDBHelper.getReadableDatabase().rawQuery();
-////                Log.d("확인","실행 3 : "+ da);
-//                intent.putExtra("date", data.getText());
-////                intent.putExtra("image", data.getImage().toString());
-//                startActivity(intent);
-//        }
     }
 
     // 생성자에서 데이터 리스트 객체를 전달받음.
@@ -76,14 +75,19 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
     // onCreateViewHolder() - 아이템 뷰를 위한 뷰홀더 객체 생성하여 리턴.
     @Override
-    public MainGridAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
         Context context = parent.getContext() ;
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
 
-        View view = inflater.inflate(R.layout.activity_main_grid, parent, false) ;
-        MainGridAdapter.ViewHolder vh = new MainGridAdapter.ViewHolder(view) ;
-
-        return vh ;
+        switch (viewType){
+            case HEADER_VIEW:
+                view = inflater.inflate(R.layout.main_grid_header, parent, false) ;
+                return new HeaderView(view) ;
+            default:
+                view = inflater.inflate(R.layout.activity_main_grid, parent, false) ;
+                return new ViewHolder(view) ;
+        }
     }
 
     // onBindViewHolder() - position에 해당하는 데이터를 뷰홀더의 아이템뷰에 표시.
@@ -92,10 +96,14 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
         MainGridData mainGridData = items.get(position);
 
-        textView.setText(mainGridData.getText());
+        if(holder instanceof HeaderView){
+            textView.setText(mainGridData.getText());
+        }else{
+            textView.setText(mainGridData.getText());
 
-        Uri image = mainGridData.getImage();
-        imageView.setImageURI(image);
+            Uri image = mainGridData.getImage();
+            imageView.setImageURI(image);
+        }
 //        String text = mData.get(position) ;
 //        holder.textView1.setText(text) ;
     }
@@ -106,13 +114,32 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
         return items.size() ;
     }
 
-    public void addData(String text, Uri image){
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position).getViewType();
+    }
+
+    public void addData(String text, Uri image, int viewType){
+
         MainGridData item = new MainGridData();
 
         item.setText(text);
         item.setImage(image);
+        item.setViewType(viewType);
 
         items.add(item);
+
+    }
+
+    public void addData2(String text, int viewType){
+
+        MainGridData item = new MainGridData();
+
+        item.setText(text);
+        item.setViewType(viewType);
+
+        items.add(item);
+
     }
 
 //    TextView textView;

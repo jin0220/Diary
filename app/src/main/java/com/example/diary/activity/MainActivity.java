@@ -32,18 +32,9 @@ public class MainActivity extends AppCompatActivity
             setTheme(R.style.DarkTheme);
 //            Log.d("확인","모드1" + sharedPreferences.getBoolean("mode",false));
         }else{
-            setTheme(R.style.AppTheme);
+            setTheme(R.style.LightTheme);
 //            Log.d("확인","모드2" + sharedPreferences.getBoolean("mode",false));
         }
-//        Toast.makeText(this,"모드" + sharedPreferences.getBoolean("mode",false),Toast.LENGTH_LONG);
-//        //야간 모드
-//        if(AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES){
-//            setTheme(R.style.DarkTheme);
-////            reStartApp();
-//        }
-//        else{
-//            setTheme(R.style.AppTheme);
-//        }
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -68,12 +59,6 @@ public class MainActivity extends AppCompatActivity
         mainFragment = new MainFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.container,mainFragment).commit(); //프래그먼트 생성
     }
-
-//    public void reStartApp(){
-//        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-//        startActivity(intent);
-//        finish();
-//    }
 
     @Override
     public void onBackPressed() {

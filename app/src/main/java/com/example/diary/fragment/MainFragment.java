@@ -29,6 +29,9 @@ public class MainFragment extends Fragment {
     FloatingActionButton btn_write;
     DiaryDBHelper diaryDBHelper;
 
+    public static final int HEADER_VIEW = 0;
+    public static final int ITEM_VIEW = 1;
+
 
     @Nullable
     @Override
@@ -49,17 +52,37 @@ public class MainFragment extends Fragment {
 
         //데이터 조회
         Cursor cursor = diaryDBHelper.select();
-
+        String oldDate = "0";
         while (cursor.moveToNext()) {
+            String[] date1;
+            String dateCombination;
             String image = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
             Uri uriImage = getUriFromPath(image);
+            date1 = date.split("-");
+            dateCombination = date1[0] + "-" + date1[1];
 
-            adapter.addData(date, uriImage);
+            if(oldDate.equals(dateCombination)){
+                adapter.addData(date, uriImage, ITEM_VIEW);
+            }else{
+                adapter.addData2(dateCombination,HEADER_VIEW);
+                adapter.addData(date, uriImage, ITEM_VIEW);
+            }
+            oldDate = dateCombination;
         }
 
-
         cursor.close();
+
+        //위치별로 차지할 폭을 결정한다
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if(adapter.getItemViewType(position) == MainGridAdapter.HEADER_VIEW){
+                    return 4; //4칸 다 차지
+                }
+                else return 1;
+            }
+        });
 
         btn_write = rootView.findViewById(R.id.floatingActionButton);
         btn_write.setOnClickListener(new View.OnClickListener() {
