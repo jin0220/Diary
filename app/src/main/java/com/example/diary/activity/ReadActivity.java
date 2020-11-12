@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.diary.R;
+import com.example.diary.adapter.SpinnerAdapter;
 import com.example.diary.data.DiaryDBHelper;
+
+import java.util.ArrayList;
 
 public class ReadActivity extends AppCompatActivity {
 
@@ -48,7 +52,7 @@ public class ReadActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);//액션바가 없을 시 툴바를 액션바로 대체
-        //getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         title = findViewById(R.id.title);
         content = findViewById(R.id.content);
@@ -98,26 +102,19 @@ public class ReadActivity extends AppCompatActivity {
 
         cursor.close();
 
-//        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-//
-//        Cursor cursor_spinner = diaryDBHelper.select();
-//
-//        while(cursor_spinner.moveToNext()){
-//            String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
-////            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, date);
-//        }
-//
-//
-//// Create an ArrayAdapter using the string array and a default spinner layout
-//        String[] planets_array = {"2020-10-27","2020-10-28"};
-////        ArrayAdapter<String> adapter = ArrayAdapter.createFromResource(this,
-////                planets_array, android.R.layout.simple_spinner_item);
-//
-//// Specify the layout to use when the list of choices appears
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//// Apply the adapter to the spinner
-//        spinner.setAdapter(adapter);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
 
+        Cursor cursor_spinner = diaryDBHelper.select();
+        ArrayList<String> spinner_date = new ArrayList<>();
+
+        while(cursor_spinner.moveToNext()){
+            String d = cursor_spinner.getString(cursor_spinner.getColumnIndexOrThrow(diaryDBHelper.DATE));
+            String[] s_d = d.split(" ");
+            spinner_date.add(s_d[0]);
+        }
+
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(this, spinner_date);
+        spinner.setAdapter(spinnerAdapter);
 
 
     }

@@ -103,6 +103,11 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
             Uri image = mainGridData.getImage();
             imageView.setImageURI(image);
+
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inSampleSize = 8; // 1/8 로 크기를 줄임
+//            Bitmap bitmap = BitmapFactory.decodeFile(image, options);
+//            imageView.setImageBitmap(bitmap);
         }
 //        String text = mData.get(position) ;
 //        holder.textView1.setText(text) ;
