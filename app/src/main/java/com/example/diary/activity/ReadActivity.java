@@ -63,9 +63,9 @@ public class ReadActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         date = intent.getExtras().getString("date");
-//        image = intent.getExtras().getString("Image");
 
-        Cursor cursor = diaryDBHelper.read(date);
+        String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + "'" + date + "'";
+        Cursor cursor = diaryDBHelper.select_sql(sql); //오류(같은 날짜일 경우 맨 처음 작성한 데이터만 가져옴)
         if(cursor.moveToNext()){
             String i = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
@@ -98,24 +98,23 @@ public class ReadActivity extends AppCompatActivity {
             title.setText(t);
             content.setText(c);
 
+
         }
 
         cursor.close();
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        Spinner spinner = findViewById(R.id.spinner);
 
         Cursor cursor_spinner = diaryDBHelper.select();
         ArrayList<String> spinner_date = new ArrayList<>();
 
         while(cursor_spinner.moveToNext()){
             String d = cursor_spinner.getString(cursor_spinner.getColumnIndexOrThrow(diaryDBHelper.DATE));
-            String[] s_d = d.split(" ");
-            spinner_date.add(s_d[0]);
+            spinner_date.add(d);
         }
 
-        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(this, spinner_date);
+        SpinnerAdapter spinnerAdapter = new SpinnerAdapter(this, spinner_date, date);
         spinner.setAdapter(spinnerAdapter);
-
 
     }
 

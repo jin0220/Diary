@@ -1,6 +1,8 @@
 package com.example.diary.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,7 +16,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -42,18 +47,19 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     int GET_GALLERY_IMAGE = 200;
     int GET_CAPTURE_IMAGE = 201;
 
-    TextView title, content;
+    TextView title, content, date_text;
     Button gallery, camera, store;
     ImageView[] imageViews = new ImageView[10];
     int[] imageViewId = {R.id.photo1, R.id.photo2, R.id.photo3, R.id.photo4, R.id.photo5, R.id.photo6, R.id.photo7, R.id.photo8, R.id.photo9, R.id.photo10};
     ArrayList<Uri> imageUris;
-//    ArrayList <Uri> modi_uris;
+    //    ArrayList <Uri> modi_uris;
     Uri photoURI;
     String currentPhotoPath;
     String id;
     boolean modify = false;
     int store_state = 0;
     int image_ch = 0;
+    int year, month, day;
 
     DiaryDBHelper diaryDBHelper;
 
@@ -67,7 +73,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
         diaryDBHelper = new DiaryDBHelper(this);
 
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             imageViews[i] = findViewById(imageViewId[i]);
         }
         gallery = findViewById(R.id.gallery);
@@ -105,6 +111,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
         store = findViewById(R.id.store);
 
+        date_text = findViewById(R.id.date_text);
 
         store.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,8 +126,9 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 Log.d("확인", "데이터 가져오기3");
                 String c = content.getText().toString();
                 Log.d("확인", "데이터 가져오기4");
-                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
+//                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
                 Log.d("확인", "데이터 가져오기5");
+                String date = date_text.getText().toString();
 
 //                Log.d("확인", "데이터 삽입 : " + imagePath);
 
@@ -128,12 +136,11 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 //                Toast.makeText(getApplicationContext(),"modify: " + modify, Toast.LENGTH_LONG).show();
 
                 //사진을 바꾸지 않을 경우 오류
-                if(store_state == 0) {
+                if (store_state == 0) {
 //                    String imagePath = uri_path(imageUris.get(0));
                     diaryDBHelper.insert(t, imagePath, c, date);
                     finish();
-                }
-                else{
+                } else {
 //                    String imagePath;
 //                    if(image_ch == 0){
 //                        imagePath = uri_path(imageUris.get(0));
@@ -141,7 +148,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 //                        imagePath = uri_path(modi_uris.get(0));
 //                    }
                     Log.d("확인", "데이터 수정 image_ch : " + image_ch);
-                    diaryDBHelper.update(id,t,imagePath,c,date);
+                    diaryDBHelper.update(id, t, imagePath, c, date);
                     Log.d("확인", "데이터 삽입 성공");
                 }
             }
@@ -178,35 +185,60 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 //                Log.d("확인", "셋팅 성공");
 //            }
 //        }
+
+        Calendar calendar = Calendar.getInstance();
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+
+
+        date_text.setText(year + "년 " + (month + 1) + "월 " + day + "일"); //디폴트
+
+        LinearLayout date_set = findViewById(R.id.date_set);
+        date_set.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(WriteActivity.this, AlertDialog.THEME_HOLO_LIGHT, listener, year, month, day).show();
+            }
+        });
+
     }
 
-//uri를 path로 바꾸기
+    //datepicker
+    private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+            date_text.setText(year + "년 " + (monthOfYear + 1) + "월 " + dayOfMonth + "일");
+        }
+    };
+
+    //uri를 path로 바꾸기
     private String uri_path(Uri uri) {
 
         String id = uri.getLastPathSegment().split(":")[1];
-        final String[] imageColumns = {MediaStore.Images.Media.DATA };
+        final String[] imageColumns = {MediaStore.Images.Media.DATA};
         final String imageOrderBy = null;
 
         Uri uriImage = getUri();
         String selectedImagePath = "path";
 
         Cursor imageCursor = getContentResolver().query(uriImage, imageColumns,
-                MediaStore.Images.Media._ID + "="+id, null, imageOrderBy);
+                MediaStore.Images.Media._ID + "=" + id, null, imageOrderBy);
 
         if (imageCursor.moveToFirst()) {
             selectedImagePath = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
         }
-        Log.e("path",selectedImagePath ); // use selectedImagePath
+        Log.e("path", selectedImagePath); // use selectedImagePath
 
         imageCursor.close();
-        Log.d("확인","실행 6 : " + selectedImagePath);
+        Log.d("확인", "실행 6 : " + selectedImagePath);
         return selectedImagePath;
     }
 
 
     private Uri getUri() {
         String state = Environment.getExternalStorageState();
-        if(!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
+        if (!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
             return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
 
         return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -216,38 +248,37 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     private byte[] imageViewToByte(ImageView imageView) {
         Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,70,stream); //70% 압축
+        bitmap.compress(Bitmap.CompressFormat.PNG, 70, stream); //70% 압축
         byte[] byteArray = stream.toByteArray();
         return byteArray;
     }
 
 
     private File createImageFile() throws IOException {
-        Log.d("확인","2");
+        Log.d("확인", "2");
         // Create an image file name 이미지 파일 이름
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
 
-        Log.d("확인",storageDir.toString());
+        Log.d("확인", storageDir.toString());
 //        File image1 = new File("/sdcard/DCIM/Camera/" + imageFileName + ".jpg");
         // Save a file: path for use with ACTION_VIEW intents 파일저장
         currentPhotoPath = image.getAbsolutePath();
-        Log.d("확인",currentPhotoPath);
+        Log.d("확인", currentPhotoPath);
         return image;
     }
-
 
 
     private void dispatchTakePictureIntent() {
         String state = Environment.getExternalStorageState();
 
-        if(Environment.MEDIA_MOUNTED.equals(state)) {
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
 
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             // Ensure that there's a camera activity to handle the intent
@@ -264,8 +295,8 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 if (photoFile != null) {
                     try {
                         photoURI = FileProvider.getUriForFile(WriteActivity.this, "com.example.diary", photoFile);
-                    }catch (IllegalArgumentException e){
-                        Toast.makeText(this, "예외2",Toast.LENGTH_LONG).show();
+                    } catch (IllegalArgumentException e) {
+                        Toast.makeText(this, "예외2", Toast.LENGTH_LONG).show();
                     }
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                     startActivityForResult(takePictureIntent, GET_CAPTURE_IMAGE);
@@ -273,7 +304,8 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             }
         }
     }
-//갤러리에 사진 추가
+
+    //갤러리에 사진 추가
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(currentPhotoPath); //

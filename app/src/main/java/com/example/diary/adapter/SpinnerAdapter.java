@@ -15,11 +15,13 @@ public class SpinnerAdapter extends BaseAdapter {
 
     Context mContext;
     ArrayList<String> Data;
+    String date;
     LayoutInflater Inflater;
 
-    public SpinnerAdapter (Context context, ArrayList<String> data){
+    public SpinnerAdapter (Context context, ArrayList<String> data, String date){
         this.mContext = context;
         this.Data = data;
+        this.date = date;
         Inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -47,8 +49,8 @@ public class SpinnerAdapter extends BaseAdapter {
         }
 
         if(Data!=null){
-            String text = Data.get(i);
-            ((TextView)view.findViewById(R.id.spinnerText)).setText(text);
+//            String text = Data.get(i);
+            ((TextView)view.findViewById(R.id.spinnerText)).setText(date);
         }
 
         return view;

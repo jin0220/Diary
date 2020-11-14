@@ -4,6 +4,7 @@ import android.net.Uri;
 
 public class MainGridData {
     String text;
+    String date;
     Uri image;
     int viewType;
 
@@ -19,6 +20,10 @@ public class MainGridData {
         return viewType;
     }
 
+    public String getDate() {
+        return date;
+    }
+
     public void setText(String text) {
         this.text = text;
     }
@@ -31,4 +36,7 @@ public class MainGridData {
         this.viewType = viewType;
     }
 
+    public void setDate(String date) {
+        this.date = date;
+    }
 }

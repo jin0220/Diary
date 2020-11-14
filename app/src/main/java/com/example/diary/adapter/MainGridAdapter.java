@@ -59,7 +59,7 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 //                String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + i;
 //                Cursor cursor = diaryDBHelper.getReadableDatabase().rawQuery();
 //                Log.d("확인","실행 3 : "+ da);
-                    intent.putExtra("date", data.getText());
+                    intent.putExtra("date", data.getDate());
 //                intent.putExtra("image", data.getImage().toString());
                     v.getContext().startActivity(intent);
 
@@ -122,13 +122,18 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
     @Override
     public int getItemViewType(int position) {
         return items.get(position).getViewType();
+//        if (items.get(position).getViewType() == 0) return HEADER_VIEW;
+//        else return ITEM_VIEW;
     }
 
+    //grid
     public void addData(String text, Uri image, int viewType){
-
         MainGridData item = new MainGridData();
 
-        item.setText(text);
+        String date = convert(text);
+
+        item.setText(date);
+        item.setDate(text);
         item.setImage(image);
         item.setViewType(viewType);
 
@@ -136,8 +141,9 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
     }
 
-    public void addData2(String text, int viewType){
 
+    //header
+    public void addData2(String text, int viewType){
         MainGridData item = new MainGridData();
 
         item.setText(text);
@@ -145,6 +151,50 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
         items.add(item);
 
+    }
+
+    private String convert(String text) {
+        String[] date = text.split(" ");
+        String[] day = date[2].split("일");
+        switch (date[1]){
+            case "1월":
+                date[1] = "Jan.";
+                break;
+            case "2월":
+                date[1] = "Feb.";
+                break;
+            case "3월":
+                date[1] = "Mar.";
+                break;
+            case "4월":
+                date[1] = "Apr.";
+                break;
+            case "5월":
+                date[1] = "May.";
+                break;
+            case "6월":
+                date[1] = "Jun.";
+                break;
+            case "7월":
+                date[1] = "Jul.";
+                break;
+            case "8월":
+                date[1] = "Aug.";
+                break;
+            case "9월":
+                date[1] = "Sep.";
+                break;
+            case "10월":
+                date[1] = "Oct.";
+                break;
+            case "11월":
+                date[1] = "Nov.";
+                break;
+            case "12월":
+                date[1] = "Dec.";
+                break;
+        }
+        return date[1] + "\n" + day[0];
     }
 
 //    TextView textView;

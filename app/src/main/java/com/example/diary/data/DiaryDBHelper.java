@@ -82,7 +82,7 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
                 CONTENT
         };
 
-        String sortOrder = DATE + " DESC";
+        String sortOrder = DATE + " DESC, " + _ID + " DESC";
 
         Cursor cursor = sqLiteDatabase.query(
                 TABLE_NAME,   // The table to query
@@ -97,15 +97,15 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         return  cursor;
     }
 
-    public Cursor read(String date){
-        sqLiteDatabase = getReadableDatabase();
-
-        String sql = "select * from "+ TABLE_NAME + " where date = " + "'" + date + "'";
-//        Log.d("확인", sql);
-        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
-
-        return cursor;
-    }
+//    public Cursor read(String date){
+//        sqLiteDatabase = getReadableDatabase();
+//
+//        String sql = "select * from "+ TABLE_NAME + " where date = " + "'" + date + "'";
+////        Log.d("확인", sql);
+//        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
+//
+//        return cursor;
+//    }
 
     public  Cursor select_sql(String sql){
         sqLiteDatabase = getReadableDatabase();
