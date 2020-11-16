@@ -17,6 +17,7 @@ public class SpinnerAdapter extends BaseAdapter {
     ArrayList<String> Data;
     String date;
     LayoutInflater Inflater;
+    int set = 0;
 
     public SpinnerAdapter (Context context, ArrayList<String> data, String date){
         this.mContext = context;
@@ -49,10 +50,15 @@ public class SpinnerAdapter extends BaseAdapter {
         }
 
         if(Data!=null){
-//            String text = Data.get(i);
-            ((TextView)view.findViewById(R.id.spinnerText)).setText(date);
+            String text;
+            if(set == 0){ // 현재 데이터에 대한 날짜를 먼저 셋팅
+                text = date;
+                set++;
+            }else {
+                text = Data.get(i);
+            }
+            ((TextView)view.findViewById(R.id.spinnerText)).setText(text);
         }
-
         return view;
     }
 

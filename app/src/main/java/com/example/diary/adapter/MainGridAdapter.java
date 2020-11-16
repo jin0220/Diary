@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHolder> {
 
-    TextView textView;
+    TextView textView, id;
     ImageView imageView;
 
     public static final int HEADER_VIEW = 0;
@@ -34,6 +34,12 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
             textView = itemView.findViewById(R.id.date);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
     }
 
@@ -46,23 +52,16 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
             // 뷰 객체에 대한 참조. (hold strong reference)
             textView = itemView.findViewById(R.id.textView) ;
             imageView = itemView.findViewById(R.id.imageView);
+            id = itemView.findViewById(R.id.id);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO : process click event.
                     Intent intent = new Intent(v.getContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
-//                Log.d("확인","실행 2");
                     int position = getAdapterPosition();
                     MainGridData data = (MainGridData) items.get(position);
-//                Log.d("확인",  item.getText()); //날짜
-//                String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + i;
-//                Cursor cursor = diaryDBHelper.getReadableDatabase().rawQuery();
-//                Log.d("확인","실행 3 : "+ da);
-                    intent.putExtra("date", data.getDate());
-//                intent.putExtra("image", data.getImage().toString());
+                    intent.putExtra("id", data.getId());
                     v.getContext().startActivity(intent);
-
                 }
             });
         }
@@ -100,6 +99,7 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
             textView.setText(mainGridData.getText());
         }else{
             textView.setText(mainGridData.getText());
+            id.setText(mainGridData.getId());
 
             Uri image = mainGridData.getImage();
             imageView.setImageURI(image);
@@ -122,23 +122,21 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
     @Override
     public int getItemViewType(int position) {
         return items.get(position).getViewType();
-//        if (items.get(position).getViewType() == 0) return HEADER_VIEW;
-//        else return ITEM_VIEW;
     }
 
     //grid
-    public void addData(String text, Uri image, int viewType){
+    public void addData(String id, String text, Uri image, int viewType){
+
         MainGridData item = new MainGridData();
 
         String date = convert(text);
 
+        item.setId(id);
         item.setText(date);
-        item.setDate(text);
         item.setImage(image);
         item.setViewType(viewType);
 
         items.add(item);
-
     }
 
 
@@ -196,104 +194,4 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
         }
         return date[1] + "\n" + day[0];
     }
-
-//    TextView textView;
-//    ImageView imageView;
-//
-//    ArrayList<MainGridData> items = new ArrayList<>();
-//
-//    public MainGridAdapter() {
-//
-//    }
-//
-//    @Override
-//    public int getCount() {
-//        return items.size();
-//    }
-//
-//    @Override
-//    public Object getItem(int i) {
-//        return items.get(i);
-//    }
-//
-//    @Override
-//    public long getItemId(int i) {
-//        return i;
-//    }
-//
-//    @Override
-//    public View getView(int i, View view, ViewGroup viewGroup) {
-//        Context context = viewGroup.getContext();
-//
-//        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        view = inflater.inflate(R.layout.activity_main_grid,viewGroup,false);
-//
-//        textView = view.findViewById(R.id.textView);
-//
-//        imageView = view.findViewById(R.id.imageView);
-//
-//        MainGridData mainGridData = items.get(i);
-//
-//        textView.setText(mainGridData.getText()); //텍스트 설정
-//
-//        Uri image = mainGridData.getImage();
-////        Log.d("확인", "어댑터 " + image);
-////        Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-////        Uri uriImage = Uri.parse(image);
-////        Log.d("확인","uriimage : " + uriImage);
-////        imageView.setImageURI(uriImage);
-//        imageView.setImageURI(image);
-//
-//        return view;
-//    }
-//
-//    public void addData(String text, Uri image){
-//        String[] date = text.split("-");
-//        String[] day = date[2].split(" ");
-//        switch (date[1]){
-//            case "01":
-//                date[1] = "Jan.";
-//                break;
-//            case "02":
-//                date[1] = "Feb.";
-//                break;
-//            case "03":
-//                date[1] = "Mar.";
-//                break;
-//            case "04":
-//                date[1] = "Apr.";
-//                break;
-//            case "05":
-//                date[1] = "May.";
-//                break;
-//            case "06":
-//                date[1] = "Jun.";
-//                break;
-//            case "07":
-//                date[1] = "Jul.";
-//                break;
-//            case "08":
-//                date[1] = "Aug.";
-//                break;
-//            case "09":
-//                date[1] = "Sep.";
-//                break;
-//            case "10":
-//                date[1] = "Oct.";
-//                break;
-//            case "11":
-//                date[1] = "Nov.";
-//                break;
-//            case "12":
-//                date[1] = "Dec.";
-//                break;
-//        }
-//        MainGridData item = new MainGridData();
-//
-////        item.setText(date[1] + "\n" + day[0]);
-//        item.setText(text);
-//        item.setImage(image);
-//
-//        items.add(item);
-//    }
 }

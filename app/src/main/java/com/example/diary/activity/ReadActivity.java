@@ -38,13 +38,10 @@ public class ReadActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
 
-//        Log.d("확인","모드" + sharedPreferences.getBoolean("mode",false));
         if(sharedPreferences.getBoolean("mode",false) == true){
             setTheme(R.style.DarkTheme);
-//            Log.d("확인","모드1" + sharedPreferences.getBoolean("mode",false));
         }else{
             setTheme(R.style.LightTheme);
-//            Log.d("확인","모드2" + sharedPreferences.getBoolean("mode",false));
         }
 
         setContentView(R.layout.activity_read);
@@ -62,25 +59,20 @@ public class ReadActivity extends AppCompatActivity {
         diaryDBHelper = new DiaryDBHelper(this);
 
         Intent intent = getIntent();
-        date = intent.getExtras().getString("date");
+        id = intent.getExtras().getString("id");
 
-        String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where date = " + "'" + date + "'";
+        String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where _id = " + "'" + id + "'";
         Cursor cursor = diaryDBHelper.select_sql(sql); //오류(같은 날짜일 경우 맨 처음 작성한 데이터만 가져옴)
         if(cursor.moveToNext()){
             String i = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
             String c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.CONTENT));
-            id = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper._ID));
+            date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
 //            Log.d("확인","바꾸기 전");
 //            Uri uri = new Uri.Builder().build().parse(i);
 //            InputStream in = getContentResolver().openInputStream(uri);
 //            Bitmap bitmap = BitmapFactory.decodeStream(in);
 //            Log.d("확인","바꾸기 후");
-
-
-//            Log.d("확인","image : "+ i);
-//            Log.d("확인","title : "+ t);
-//            Log.d("확인","content : "+ c);
 
 //            BitmapFactory.Options options = new BitmapFactory.Options();
 //            options.inSampleSize = 8; // 1/8 로 크기를 줄임

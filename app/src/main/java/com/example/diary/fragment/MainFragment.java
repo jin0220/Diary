@@ -58,6 +58,7 @@ public class MainFragment extends Fragment {
             String dateCombination;
             String image = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
+            String id = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper._ID));
             Uri uriImage = getUriFromPath(image);
             date1 = date.split(" ");
             String[] year = date1[0].split("년");
@@ -65,10 +66,10 @@ public class MainFragment extends Fragment {
             dateCombination = year[0] + "-" + month[0];
 
             if(oldDate.equals(dateCombination)){
-                adapter.addData(date, uriImage, ITEM_VIEW);
+                adapter.addData(id, date, uriImage, ITEM_VIEW);
             }else{
                 adapter.addData2(dateCombination,HEADER_VIEW);
-                adapter.addData(date, uriImage, ITEM_VIEW);
+                adapter.addData(id, date, uriImage, ITEM_VIEW);
             }
             oldDate = dateCombination;
         }
@@ -91,6 +92,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), WriteActivity.class);
+                intent.putExtra("modify",false);
                 startActivity(intent);
             }
         });

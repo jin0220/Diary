@@ -17,6 +17,13 @@ public class PasswordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
+//
+//        if(sharedPreferences.getBoolean("mode",false) == true){
+//            setTheme(R.style.DarkTheme);
+//        }else{
+//            setTheme(R.style.LightTheme); //비밀번호 입력란 밑줄이 사라짐
+//        }
         setContentView(R.layout.activity_password);
 
         password1 = findViewById(R.id.password1);

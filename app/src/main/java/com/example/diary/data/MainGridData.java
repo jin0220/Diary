@@ -3,8 +3,8 @@ package com.example.diary.data;
 import android.net.Uri;
 
 public class MainGridData {
+    String id;
     String text;
-    String date;
     Uri image;
     int viewType;
 
@@ -20,8 +20,8 @@ public class MainGridData {
         return viewType;
     }
 
-    public String getDate() {
-        return date;
+    public String getId() {
+        return id;
     }
 
     public void setText(String text) {
@@ -36,7 +36,7 @@ public class MainGridData {
         this.viewType = viewType;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.diary.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -13,6 +14,13 @@ public class LoadingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
+
+        if(sharedPreferences.getBoolean("mode",false) == true){
+            setTheme(R.style.DarkTheme);
+        }else{
+            setTheme(R.style.LightTheme);
+        }
         setContentView(R.layout.activity_loading);
 
         Handler handler = new Handler();
