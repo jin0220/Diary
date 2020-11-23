@@ -13,6 +13,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.diary.R;
+import com.example.diary.fragment.CalendarFragment;
 import com.example.diary.fragment.MainFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MainFragment mainFragment;
+    CalendarFragment calendarFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +103,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, mainFragment).commit();
-        } else if (id == R.id.nav_gallery) {
-
+        } else if (id == R.id.nav_calendar) {
+            calendarFragment = new CalendarFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, calendarFragment).commit();
         } else if (id == R.id.nav_setting) {
             Intent intent = new Intent(this,SettingsActivity.class);
             startActivity(intent);
