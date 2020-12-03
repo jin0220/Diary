@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay" >
+        app:popupTheme="@style/AppTheme.PopupOverlay">
 
         <Spinner
             android:id="@+id/spinner"
@@ -34,23 +34,41 @@
             android:layout_below="@+id/toolbar">
 
 
-            <ImageView
-                android:id="@+id/photo"
+            <!--            <ImageView-->
+            <!--                android:id="@+id/photo"-->
+            <!--                android:layout_width="360dp"-->
+            <!--                android:layout_height="360dp"-->
+            <!--                android:layout_centerHorizontal="true"-->
+            <!--                android:layout_marginTop="20dp" />-->
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/viewPager"
                 android:layout_width="360dp"
                 android:layout_height="360dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp" />
 
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/viewPager"
+                android:layout_centerHorizontal="true"
+                app:tabGravity="center"
+                app:tabBackground="@drawable/dot_indicator"
+                app:tabIndicatorHeight="0dp"
+                app:tabPaddingStart="0dp"/>
+
             <TextView
                 android:id="@+id/title"
                 android:layout_width="360dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/photo"
+                android:layout_below="@id/indicator"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:text="제목입니다."
-                android:textSize="20dp"
-                android:textColor="#000"/>
+                android:textColor="#000"
+                android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/content"
@@ -60,8 +78,8 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:textColor="#000"
-                android:text="내용" />
+                android:text="내용"
+                android:textColor="#000" />
 
         </RelativeLayout>
 

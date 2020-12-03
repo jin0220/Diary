@@ -59,17 +59,24 @@ public class MainFragment extends Fragment {
             String image = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
             String id = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper._ID));
-            Uri uriImage = getUriFromPath(image);
+            Uri uriImage = null;
+            if(image != null) {
+                uriImage = getUriFromPath(image);
+            }
+
             date1 = date.split(" ");
             String[] year = date1[0].split("년");
             String[] month = date1[1].split("월");
             dateCombination = year[0] + "-" + month[0];
 
+
             if(oldDate.equals(dateCombination)){
                 adapter.addData(id, date, uriImage, ITEM_VIEW);
             }else{
+
                 adapter.addData2(dateCombination,HEADER_VIEW);
                 adapter.addData(id, date, uriImage, ITEM_VIEW);
+
             }
             oldDate = dateCombination;
         }

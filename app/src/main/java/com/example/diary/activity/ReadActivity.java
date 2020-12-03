@@ -9,17 +9,20 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.diary.R;
 import com.example.diary.adapter.SpinnerAdapter;
+import com.example.diary.adapter.ViewPagerAdapter;
 import com.example.diary.data.DiaryDBHelper;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
@@ -29,8 +32,13 @@ public class ReadActivity extends AppCompatActivity {
     DiaryDBHelper diaryDBHelper;
     String date, image;
     TextView title, content;
-    ImageView photo;
+    ViewPager viewPager;
     String id;
+    int count;
+    ViewPagerAdapter viewPagerAdapter;
+    ArrayList<Uri> photos;
+    TabLayout tabLayout;
+    String image_code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +61,8 @@ public class ReadActivity extends AppCompatActivity {
 
         title = findViewById(R.id.title);
         content = findViewById(R.id.content);
-        photo = findViewById(R.id.photo);
+        viewPager = findViewById(R.id.viewPager);
+
 
         //데이터 조회
         diaryDBHelper = new DiaryDBHelper(this);
@@ -61,36 +70,50 @@ public class ReadActivity extends AppCompatActivity {
         Intent intent = getIntent();
         id = intent.getExtras().getString("id");
 
-        String sql = "select * from "+ diaryDBHelper.TABLE_NAME + " where _id = " + "'" + id + "'";
-        Cursor cursor = diaryDBHelper.select_sql(sql); //오류(같은 날짜일 경우 맨 처음 작성한 데이터만 가져옴)
+        String sql = "select * from " + diaryDBHelper.TABLE_DIARY + " d left outer join " + diaryDBHelper.TABLE_IMAGE
+                + " i on d." + diaryDBHelper.IMAGE_CODE + " = i." + diaryDBHelper.IMAGE_CODE + " where _id = " + "'" + id + "'";
+
+        Cursor cursor = diaryDBHelper.select_sql(sql);
         if(cursor.moveToNext()){
-            String i = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
+            image_code = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
             String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
             String c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.CONTENT));
             date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
-//            Log.d("확인","바꾸기 전");
-//            Uri uri = new Uri.Builder().build().parse(i);
-//            InputStream in = getContentResolver().openInputStream(uri);
-//            Bitmap bitmap = BitmapFactory.decodeStream(in);
-//            Log.d("확인","바꾸기 후");
+            count = cursor.getInt(cursor.getColumnIndexOrThrow(diaryDBHelper.FAVORITE));
 
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inSampleSize = 8; // 1/8 로 크기를 줄임
-//            Bitmap bitmap = BitmapFactory.decodeFile(new File(i).getAbsolutePath(), options);
-//            photo.setImageBitmap(bitmap);
+            ArrayList<String> im = new ArrayList<>();
+            int j = 1;
+            while (j <= 10) {
+                if (cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE + j)) != null)
+                    im.add(cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE + j)));
+                else break;
+                j++;
+            }
 
-//            Bitmap bitmap = BitmapFactory.decodeByteArray(i, 0, i.length);
-            Uri uriImage = getUriFromPath(i);
-//            Log.d("확인", "uriImage : " + uriImage);
-////            Uri photoUri = Uri.fromFile();
-            photo.setImageURI(uriImage);
+            photos = new ArrayList<>();
+            int k = 0;
+            while (k < im.size()) {
+                if (im.get(k) != null)
+                    photos.add(getUriFromPath(im.get(k)));
+                else photos.remove(k);
+                k++;
+            }
 
-
-//            photo.setImageURI(uri);
             title.setText(t);
             content.setText(c);
+        }
 
+        //사진인 없을 경우 사진영역을 없앰
+        if(image_code == null) {
+            viewPager.setVisibility(View.GONE);
+        }else {
+            viewPager.setOffscreenPageLimit(10); //ViewPager가 상태를 유지할 페이지의 최대 갯수를 변경할 수 있게 해준다.(limit를 넘어간 page에 대해서는 죽이고, 선택되었을 때 다시 create한다)
 
+            viewPagerAdapter = new ViewPagerAdapter(photos, this);
+            viewPager.setAdapter(viewPagerAdapter);
+
+            tabLayout = findViewById(R.id.indicator);
+            tabLayout.setupWithViewPager(viewPager, true); //viewpager와 tabLayout 연결
         }
 
         cursor.close();
@@ -127,10 +150,15 @@ public class ReadActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.read,menu);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//뒤로가기 버튼
-
+        //좋아요 버튼 상태
+        if(count == 0){
+            menu.findItem(R.id.favorite).setIcon(R.drawable.ic_favorite);
+        }else {
+            menu.findItem(R.id.favorite).setIcon(R.drawable.ic_favorite_press);
+        }
         return true;
     }
-int count = 0;
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
@@ -141,9 +169,11 @@ int count = 0;
                 if(count == 0){
                     item.setIcon(R.drawable.ic_favorite_press);
                     count++;
+                    diaryDBHelper.favorit_update(id, count);
                 }else{
                     item.setIcon(R.drawable.ic_favorite);
                     count--;
+                    diaryDBHelper.favorit_update(id, count);
                 }
                 break;
             case R.id.delete:

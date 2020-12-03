@@ -65,7 +65,6 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
     DiaryDBHelper diaryDBHelper;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,8 +122,26 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 String date = date_text.getText().toString();
 
                 if (store_state == 0) { //새로 작성
-                    String imagePath = uri_path(imageUris.get(0));
-                    diaryDBHelper.insert(t, imagePath, c, date);
+                    ArrayList<String> imagePath = new ArrayList<>();
+                    int j = 0;
+                    while (j < 10) {
+                        imagePath.add(null);
+                        j++;
+                    }
+
+                    int i = 0;
+                    if (imageUris != null) {
+                        while (i < imageUris.size()) {
+                            imagePath.set(i, uri_path(imageUris.get(i)));
+                            i++;
+                        }
+                    }
+
+                    String image_code = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                    diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
+                    diaryDBHelper.image_insert(image_code, imagePath.get(0), imagePath.get(1), imagePath.get(2), imagePath.get(3), imagePath.get(4),
+                            imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
+
                     finish();
                 } else { //수정
                     String imagePath;
@@ -147,7 +164,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             id = intent.getExtras().getString("id");
             store_state = 1;
 
-            String sql = "select * from " + diaryDBHelper.TABLE_NAME + " where _id = " + "'" + id + "'";
+            String sql = "select * from " + diaryDBHelper.TABLE_DIARY + " where _id = " + "'" + id + "'";
 
             Cursor cursor = diaryDBHelper.select_sql(sql);
             if (cursor.moveToNext()) {
