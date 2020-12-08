@@ -62,6 +62,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     int store_state = 0;
     int image_ch = 1;
     int year, month, day;
+    String i_c; //수정할 때 이미지 코드값 저장할 변수
 
     DiaryDBHelper diaryDBHelper;
 
@@ -136,21 +137,55 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                             i++;
                         }
                     }
-
-                    String image_code = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                    diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
-                    diaryDBHelper.image_insert(image_code, imagePath.get(0), imagePath.get(1), imagePath.get(2), imagePath.get(3), imagePath.get(4),
-                            imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
-
-                    finish();
-                } else { //수정
-                    String imagePath;
-                    if(image_ch == 0) { //사진 수정했을 경우
-                        imagePath = uri_path(imageUris.get(0));
-                    }else{
-                        imagePath = uri_path(modi_uris.get(0));
+                    String image_code = null;
+                    if(imagePath.get(0) != null) {
+                        image_code = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                        diaryDBHelper.image_insert(image_code, imagePath.get(0), imagePath.get(1), imagePath.get(2), imagePath.get(3), imagePath.get(4),
+                                imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
                     }
-                    diaryDBHelper.update(id, t, imagePath, c, date);
+                    diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
+                    finish();
+                }
+                else { //수정  (사진을 지우는 것도 가능하게 수정하기)
+                    ArrayList<String> imagePath = new ArrayList<>();
+                    int j = 0;
+                    while (j < 10) {
+                        imagePath.add(null);
+                        j++;
+                    }
+                    if(image_ch == 0) { //사진 수정했을 경우
+                        int i = 0;
+                        if (imageUris != null) {
+                            while (i < imageUris.size()) {
+                                imagePath.set(i, uri_path(imageUris.get(i)));
+                                i++;
+                            }
+                        }
+                    }else{
+                        int i = 0;
+                        if (modi_uris != null) {
+                            while (i < modi_uris.size()) {
+                                imagePath.set(i, uri_path(modi_uris.get(i)));
+                                i++;
+                            }
+                        }
+                    }
+
+                    if(i_c != null) { //원래 사진이 있었을 경우
+                        diaryDBHelper.image_update(i_c, imagePath.get(0), imagePath.get(1), imagePath.get(2), imagePath.get(3), imagePath.get(4),
+                                imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
+                        diaryDBHelper.update(id, t, imagePath.get(0), c, date, i_c);
+                    }
+                    else if(imagePath.get(0) != null){ //사진이 없던 상태에서 사진 넣었을 경우
+                        String code = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                        diaryDBHelper.image_insert(code, imagePath.get(0), imagePath.get(1), imagePath.get(2), imagePath.get(3), imagePath.get(4),
+                                imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
+                        diaryDBHelper.update(id, t, imagePath.get(0), c, date, code);
+                    }
+                    else{ //사진이 없던 상태에서 사진 추가 없이 글만 수정할 경우
+                        diaryDBHelper.update(id, t, imagePath.get(0), c, date, i_c);
+                    }
+
                     finish();
                 }
             }
@@ -164,18 +199,39 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             id = intent.getExtras().getString("id");
             store_state = 1;
 
-            String sql = "select * from " + diaryDBHelper.TABLE_DIARY + " where _id = " + "'" + id + "'";
+            String sql = "select * from " + diaryDBHelper.TABLE_DIARY + " d left outer join " + diaryDBHelper.TABLE_IMAGE
+                    + " i on d." + diaryDBHelper.IMAGE_CODE + " = i." + diaryDBHelper.IMAGE_CODE + " where _id = " + "'" + id + "'";
 
             Cursor cursor = diaryDBHelper.select_sql(sql);
             if (cursor.moveToNext()) {
-                String i = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
+                i_c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE_CODE));
                 String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
                 String c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.CONTENT));
                 String d = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
-                Uri uriImage = getUriFromPath(i);
+
+                ArrayList<String> im = new ArrayList<>();
+                int j = 1;
+                while (j <= 10) {
+                    if (cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE + j)) != null)
+                        im.add(cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE + j)));
+                    else break;
+                    j++;
+                }
+
                 modi_uris = new ArrayList<>();
-                modi_uris.add(uriImage);
-                imageViews[0].setImageURI(modi_uris.get(0));
+                int k = 0;
+                while (k < im.size()) {
+                    if (im.get(k) != null)
+                        modi_uris.add(getUriFromPath(im.get(k)));
+                    else modi_uris.remove(k);
+                    k++;
+                }
+
+                int l = 0;
+                while (l < modi_uris.size()){
+                    imageViews[l].setImageURI(modi_uris.get(l));
+                    l++;
+                }
 
                 title.setText(t);
                 content.setText(c);

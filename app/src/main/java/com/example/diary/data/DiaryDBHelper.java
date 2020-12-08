@@ -139,16 +139,6 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         return  cursor;
     }
 
-//    public Cursor read(String date){
-//        sqLiteDatabase = getReadableDatabase();
-//
-//        String sql = "select * from "+ TABLE_NAME + " where date = " + "'" + date + "'";
-////        Log.d("확인", sql);
-//        Cursor cursor = sqLiteDatabase.rawQuery(sql,null);
-//
-//        return cursor;
-//    }
-
     public  Cursor select_sql(String sql){
         sqLiteDatabase = getReadableDatabase();
 
@@ -157,11 +147,12 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public boolean update(String id, String t, String i, String c , String date){
+    public boolean update(String id, String t, String i, String c , String date, String code){
         ContentValues values = new ContentValues();
         values.put(_ID, id);
         values.put(TITLE, t);
-        values.put(IMAGE_CODE, i); //수정
+        values.put(IMAGE, i);
+        values.put(IMAGE_CODE, code);
         values.put(CONTENT, c);
         values.put(DATE, date);
         return sqLiteDatabase.update(TABLE_DIARY, values, "_id=" + id, null) > 0;
@@ -203,5 +194,22 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         values.put(IMAGE10, image10);
 
         sqLiteDatabase.insert(DiaryDBHelper.TABLE_IMAGE, null, values); //레코드 삽입
+    }
+
+    public boolean image_update(String code, String image1, String image2, String image3, String image4, String image5, String image6, String image7, String image8, String image9, String image10){
+        ContentValues values = new ContentValues();
+        values.put(IMAGE_CODE, code);
+        values.put(IMAGE1, image1);
+        values.put(IMAGE2, image2);
+        values.put(IMAGE3, image3);
+        values.put(IMAGE4, image4);
+        values.put(IMAGE5, image5);
+        values.put(IMAGE6, image6);
+        values.put(IMAGE7, image7);
+        values.put(IMAGE8, image8);
+        values.put(IMAGE9, image9);
+        values.put(IMAGE10, image10);
+
+        return sqLiteDatabase.update(TABLE_IMAGE, values, "image_code = '" + code + "'", null) > 0;
     }
 }
