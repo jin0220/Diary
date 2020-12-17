@@ -103,9 +103,6 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         values.put(IMAGE, i);
         if(i != null)
             values.put(IMAGE_CODE, code);
-//        else{
-//            values.put(IMAGE_CODE,null);
-//        }
         values.put(CONTENT, c);
         values.put(DATE, date);
 
@@ -211,5 +208,9 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
         values.put(IMAGE10, image10);
 
         return sqLiteDatabase.update(TABLE_IMAGE, values, "image_code = '" + code + "'", null) > 0;
+    }
+
+    public Boolean image_delete(String code){
+        return sqLiteDatabase.delete(TABLE_IMAGE, "image_code = '" + code + "'", null) > 0;
     }
 }

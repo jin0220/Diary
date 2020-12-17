@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,15 +15,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.diary.R;
+import com.example.diary.adapter.CalendarListAdapter;
 import com.example.diary.data.DiaryDBHelper;
 import com.example.diary.decorator.EventDecorator;
 import com.example.diary.decorator.SaturdayDecorator;
 import com.example.diary.decorator.SundayDecorator;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.prolificinteractive.materialcalendarview.format.TitleFormatter;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +37,12 @@ public class CalendarFragment extends Fragment {
     TextView schedule;
     MaterialCalendarView calendar;
     DiaryDBHelper diaryDBHelper;
+    LinearLayout schedule_page;
+    CalendarListAdapter calendarListAdapter;
+    ListView schedule_list;
+    FloatingActionButton floatingActionButton;
+    
+
 
     @Nullable
     @Override
@@ -47,14 +58,14 @@ public class CalendarFragment extends Fragment {
         Cursor cursor = diaryDBHelper.select();
         ArrayList<CalendarDay> calendarDayArrayList = new ArrayList<>();
 
-        while (cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             String date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
             String[] d = date.split(" ");
             String year = d[0].split("년")[0];
             String month = d[1].split("월")[0];
             String day = d[2].split("일")[0];
 
-            CalendarDay calendarDay = CalendarDay.from(Integer.valueOf(year),Integer.valueOf(month) - 1,Integer.valueOf(day));
+            CalendarDay calendarDay = CalendarDay.from(Integer.valueOf(year), Integer.valueOf(month) - 1, Integer.valueOf(day));
             calendarDayArrayList.add(calendarDay);
         }
 
@@ -62,19 +73,19 @@ public class CalendarFragment extends Fragment {
         schedule.setText(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "일의 일정");
 
         calendar.addDecorators(new SaturdayDecorator(),
-                                new SundayDecorator(),
+                new SundayDecorator(),
 //                                new SelectorDecorator(getActivity()),
-                                new EventDecorator(Color.GREEN, calendarDayArrayList));
+                new EventDecorator(Color.GREEN, calendarDayArrayList));
 
         //달력 년/월 표시
         calendar.setTitleFormatter(new TitleFormatter() {
-                @Override
-                public CharSequence format(CalendarDay day) {
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월");
-                    String monthAndYear = simpleDateFormat.format(day.getDate());
+            @Override
+            public CharSequence format(CalendarDay day) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월");
+                String monthAndYear = simpleDateFormat.format(day.getDate());
 
-                    return monthAndYear;
-                }
+                return monthAndYear;
+            }
         });
 
         // 날짜가 변경될 때 이벤트를 받기 위한 리스너
@@ -91,7 +102,36 @@ public class CalendarFragment extends Fragment {
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
             }
         });
+
+        schedule_page = rootView.findViewById(R.id.schedule_view);
+
+        calendarListAdapter = new CalendarListAdapter();
+        schedule_list = rootView.findViewById(R.id.schedule_list);
+        schedule_list.setAdapter(calendarListAdapter);
+
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+        calendarListAdapter.addData("schedule");
+
+        SlidingUpPanelLayout slidingUpPanelLayout = rootView.findViewById(R.id.slidinguppanel);
+        slidingUpPanelLayout.setDragView(rootView.findViewById(R.id.schedule)); //패널 열기위해 드래그하는 위치
+
+        floatingActionButton = rootView.findViewById(R.id.floatingActionButton);
+
         return rootView;
 
     }
+
 }

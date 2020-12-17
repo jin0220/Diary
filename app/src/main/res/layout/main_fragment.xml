@@ -22,7 +22,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         app:borderWidth="0dp"
-        android:elevation="0dp"/>
+        android:elevation="0dp"
+        android:outlineSpotShadowColor="#fff"/>
 
 
 </RelativeLayout>

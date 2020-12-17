@@ -75,7 +75,7 @@ public class ReadActivity extends AppCompatActivity {
 
         Cursor cursor = diaryDBHelper.select_sql(sql);
         if(cursor.moveToNext()){
-            image_code = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE));
+            image_code = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE_CODE));
             String t = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.TITLE));
             String c = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.CONTENT));
             date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
@@ -135,6 +135,9 @@ public class ReadActivity extends AppCompatActivity {
 
 //path를 uri로 바꾸기
     public Uri getUriFromPath(String filePath) {
+        if(filePath.contains("files/Pictures")){
+            return Uri.parse(filePath);
+        }
         Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null, "_data = '" + filePath + "'", null, null);
 
@@ -178,6 +181,7 @@ public class ReadActivity extends AppCompatActivity {
                 break;
             case R.id.delete:
                 diaryDBHelper.delete(id);
+                diaryDBHelper.image_delete(image_code);
                 finish();
                 return true;
             case R.id.modify:

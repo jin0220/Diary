@@ -109,13 +109,14 @@ public class MainFragment extends Fragment {
 
     //path를 uri로 바꾸기
     public Uri getUriFromPath(String filePath) {
+        if(filePath.contains("files/Pictures")){
+            return Uri.parse(filePath);
+        }
         Cursor cursor = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null, "_data = '" + filePath + "'", null, null);
-
         cursor.moveToNext();
         int id = cursor.getInt(cursor.getColumnIndex("_id"));
         Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-
         return uri;
     }
 }

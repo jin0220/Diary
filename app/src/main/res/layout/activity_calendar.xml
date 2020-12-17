@@ -1,24 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:id="@+id/calendar"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/slidinguppanel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:mcv_selectionColor="@color/colorAccent"
-        app:mcv_showOtherDates="all"/>
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        app:umanoDragView="@id/schedule_view"
+        app:umanoOverlay="false"
+        app:umanoPanelHeight="230dp"
+        app:umanoScrollableView="@id/schedule_list"
+        app:umanoShadowHeight="1dp">
+        <!-- gravity 를 bottom으로 하면 아래에서 위로 드래그, top으로 하면 위에서 아래로 드래그 할 수 있다.
+            umanoDragView 드래그 해서 보여줄 view를 선택
+            umanoScrollableView  슬라이딩 패널에 내용물이 패널에 표시되는것보다 많을 때 스크롤 해서 보여줄 view 부분
+            umanoParallaxOffset 에 값을 주면 해당 높이만큼 뒤에 화면을 올려준다.
+            umanoShadowHeight 는 슬라이딩 패널 윗부분에 그림자 효과
+            umanoOverlay 를 false로 해주면 슬라이딩 패널이 위로 보이고 뒷 부분은 반투명하게 보인다. -->
 
-    <TextView
-        android:id="@+id/schedule"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="일정"
-        android:textSize="20dp"
-        android:textColor="@color/colorPrimary"
-        android:paddingLeft="20dp"/>
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:id="@+id/calendar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:mcv_selectionColor="@color/colorAccent"
+            app:mcv_showOtherDates="all" />
 
-</LinearLayout>
+        <LinearLayout
+            android:id="@+id/schedule_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="20dp"
+                android:text="일정"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20dp" />
+
+            <ListView
+                android:id="@+id/schedule_list"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginTop="10dp" />
+
+        </LinearLayout>
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:backgroundTint="#B5B6D4"
+        android:clickable="true"
+        android:elevation="0dp"
+        android:src="@drawable/ic_add"
+        app:borderWidth="0dp"
+        android:outlineSpotShadowColor="#fff"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"/>
+
+</RelativeLayout>

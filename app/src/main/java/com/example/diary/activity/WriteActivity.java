@@ -121,6 +121,8 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 String t = title.getText().toString();
                 String c = content.getText().toString();
                 String date = date_text.getText().toString();
+//                String day = String.format("%02d")date.split(" ")[2].split("일")[0];
+
 
                 if (store_state == 0) { //새로 작성
                     ArrayList<String> imagePath = new ArrayList<>();
@@ -136,6 +138,9 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                             imagePath.set(i, uri_path(imageUris.get(i)));
                             i++;
                         }
+                    }
+                    else if(currentPhotoPath != null) {
+                        imagePath.set(0, currentPhotoPath);
                     }
                     String image_code = null;
                     if(imagePath.get(0) != null) {
@@ -235,6 +240,12 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
                 title.setText(t);
                 content.setText(c);
+
+                //스피너 날짜 셋팅
+                year = Integer.parseInt(d.split(" ")[0].split("년")[0]);
+                month = Integer.parseInt(d.split(" ")[1].split("월")[0]) - 1;
+                day = Integer.parseInt(d.split(" ")[2].split("일")[0]);
+
                 date_text.setText(d);
             }
         } else {
@@ -243,7 +254,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             month = calendar.get(Calendar.MONTH);
             day = calendar.get(Calendar.DAY_OF_MONTH);
 
-            date_text.setText(year + "년 " + (month + 1) + "월 " + day + "일"); //디폴트
+            date_text.setText(year + "년 " + String.format("%02d", (month + 1)) + "월 " + String.format("%02d", day) + "일"); //디폴트
         }
         LinearLayout date_set = findViewById(R.id.date_set);
         date_set.setOnClickListener(new View.OnClickListener() {
@@ -258,7 +269,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-            date_text.setText(year + "년 " + (monthOfYear + 1) + "월 " + dayOfMonth + "일");
+            date_text.setText(year + "년 " + String.format("%02d", (monthOfYear + 1)) + "월 " + String.format("%02d",dayOfMonth) + "일");
         }
     };
 
@@ -315,13 +326,17 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+//        File im = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
                 ".jpg",         /* suffix */
                 storageDir      /* directory */
         );
 
-        Log.d("확인", storageDir.toString());
+//        File storageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/diary/" + imageFileName);
+
+        Log.d("확인", "어디? " + storageDir.toString());
+        Log.d("확인", "어디얌? " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/Pictures/" + imageFileName);
 //        File image1 = new File("/sdcard/DCIM/Camera/" + imageFileName + ".jpg");
         // Save a file: path for use with ACTION_VIEW intents 파일저장
         currentPhotoPath = image.getAbsolutePath();
@@ -360,13 +375,25 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         }
     }
 
-    //갤러리에 사진 추가
+    //갤러리에 사진 추가 (수정 필요)
     private void galleryAddPic() {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        File f = new File(currentPhotoPath); //
-        Uri contentUri = Uri.fromFile(f);
-        mediaScanIntent.setData(contentUri);
-        this.sendBroadcast(mediaScanIntent);
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(currentPhotoPath); //
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+        this.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + currentPhotoPath) ));
+//        Log.d("확인3", "사진 앨범에 저장");
+//        MediaScanner media_scanner = MediaScanner.newInstance(WriteActivity.this);
+//        try {
+//            String Str_Path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/DCIM/Camera/";
+//            Log.d("확인3", Str_Path);
+//            media_scanner.mediaScanning(Str_Path + "filename" + ".jpg"); // 경로 + 제목 + .jpg
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//
+//            System.out.println(":::: Media Scan ERROR:::: = " + e);
+//        }
     }
 
 
@@ -408,12 +435,14 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
         //사진 촬영
         else if (requestCode == GET_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK) {
             galleryAddPic();
-
+            Log.d("확인3","성공?");
             /* 이미지 파일의 용량이 너무 커서 그대로 앱에 띄울 경우
              * 메모리 부족으로 비정상 종료될 수 있으므로 크기를 줄여 비트맵으로 로딩한 후 설정 */
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 8; // 1/8 로 크기를 줄임
             Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, options);
+            Log.d("확인", "이미지: current  " + currentPhotoPath);
+
             imageViews[0].setImageBitmap(bitmap);
 
         }
@@ -421,6 +450,9 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
     //path를 uri로 바꾸기
     public Uri getUriFromPath(String filePath) {
+        if(filePath.contains("files/Pictures")){
+            return Uri.parse(filePath);
+        }
         Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null, "_data = '" + filePath + "'", null, null);
 
