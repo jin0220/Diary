@@ -1,5 +1,6 @@
 package com.example.diary.fragment;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.diary.R;
+import com.example.diary.activity.ScheduleWriteActivity;
 import com.example.diary.adapter.CalendarListAdapter;
 import com.example.diary.data.DiaryDBHelper;
 import com.example.diary.decorator.EventDecorator;
@@ -41,7 +43,6 @@ public class CalendarFragment extends Fragment {
     CalendarListAdapter calendarListAdapter;
     ListView schedule_list;
     FloatingActionButton floatingActionButton;
-    
 
 
     @Nullable
@@ -129,6 +130,13 @@ public class CalendarFragment extends Fragment {
         slidingUpPanelLayout.setDragView(rootView.findViewById(R.id.schedule)); //패널 열기위해 드래그하는 위치
 
         floatingActionButton = rootView.findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ScheduleWriteActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return rootView;
 

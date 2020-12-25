@@ -32,11 +32,15 @@ public class MainFragment extends Fragment {
     public static final int HEADER_VIEW = 0;
     public static final int ITEM_VIEW = 1;
 
+//    public static Fragment mainfragment;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.main_fragment, container, false);
+
+//        mainfragment = MainFragment.this;
 
         diaryDBHelper = new DiaryDBHelper(getContext());
 

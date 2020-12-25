@@ -1,5 +1,6 @@
 package com.example.diary.activity;
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,6 +41,8 @@ public class ReadActivity extends AppCompatActivity {
     TabLayout tabLayout;
     String image_code;
 
+    public static Activity readActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +56,8 @@ public class ReadActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_read);
+
+        readActivity = ReadActivity.this;
 
         toolbar = findViewById(R.id.toolbar);
 
@@ -164,6 +169,7 @@ public class ReadActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
@@ -182,13 +188,17 @@ public class ReadActivity extends AppCompatActivity {
             case R.id.delete:
                 diaryDBHelper.delete(id);
                 diaryDBHelper.image_delete(image_code);
+                intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                MainActivity.mainActivity.finish();
                 finish();
                 return true;
             case R.id.modify:
-                Intent intent = new Intent(this, WriteActivity.class);
+                intent = new Intent(this, WriteActivity.class);
                 intent.putExtra("modify",true);
                 intent.putExtra("id",id);
                 startActivity(intent);
+//                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);

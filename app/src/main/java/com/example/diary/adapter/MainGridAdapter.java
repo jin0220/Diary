@@ -57,11 +57,12 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다명 앞에 getActivity() 붙여줌
+                    Intent intent = new Intent(v.getContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다면 앞에 getActivity() 붙여줌
                     int position = getAdapterPosition();
                     MainGridData data = (MainGridData) items.get(position);
                     intent.putExtra("id", data.getId());
                     v.getContext().startActivity(intent);
+//                    ((Activity)v.getContext()).finish();
                 }
             });
         }

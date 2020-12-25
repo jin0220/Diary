@@ -115,6 +115,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
 
         date_text = findViewById(R.id.date_text);
 
+
         store.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,7 +150,6 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                                 imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
                     }
                     diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
-                    finish();
                 }
                 else { //수정  (사진을 지우는 것도 가능하게 수정하기)
                     ArrayList<String> imagePath = new ArrayList<>();
@@ -190,9 +190,13 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                     else{ //사진이 없던 상태에서 사진 추가 없이 글만 수정할 경우
                         diaryDBHelper.update(id, t, imagePath.get(0), c, date, i_c);
                     }
-
-                    finish();
+                    ReadActivity.readActivity.finish();
                 }
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                MainActivity.mainActivity.finish();
+                finish();
             }
         });
 

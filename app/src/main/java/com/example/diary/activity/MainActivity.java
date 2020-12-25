@@ -1,5 +1,6 @@
 package com.example.diary.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ public class MainActivity extends AppCompatActivity
 
     MainFragment mainFragment;
     CalendarFragment calendarFragment;
+
+    public static Activity mainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,8 @@ public class MainActivity extends AppCompatActivity
 
         mainFragment = new MainFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.container,mainFragment).commit(); //프래그먼트 생성
+
+        mainActivity = MainActivity.this;
     }
 
     @Override

@@ -35,4 +35,12 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="MyPicker">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <!--divider color-->
+        <item name="colorControlNormal">#00000000</item>
+        <item name="android:textSize">20dp</item>
+    </style>
+
 </resources>
