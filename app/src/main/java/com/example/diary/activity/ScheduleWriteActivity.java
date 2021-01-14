@@ -2,15 +2,19 @@ package com.example.diary.activity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.diary.R;
+import com.example.diary.data.DiaryDBHelper;
 
 import java.util.Calendar;
 
@@ -24,6 +28,9 @@ public class ScheduleWriteActivity extends AppCompatActivity {
     int start_count = 0, end_count = 0;
     TextView startDate, endDate, startTime, endTime;
     Calendar calendar;
+    Button store, cancel;
+    DiaryDBHelper diaryDBHelper;
+    EditText title, memo;
 
 
     @Override
@@ -90,25 +97,29 @@ public class ScheduleWriteActivity extends AppCompatActivity {
         startDate.setText(yearPicker.getValue() + "년 " + monthPicker.getValue() +"월 " + dayPicker.getValue() + "일");
         endDate.setText(yearPicker2.getValue() + "년 " + monthPicker2.getValue() +"월 " + dayPicker2.getValue() + "일");
 
+        int curren_time = timePicker.getCurrentHour();
+
         if(timePicker.getCurrentHour() < 12) {
-            startTime.setText("오전 " + timePicker.getCurrentHour() + ":" + String.format("%02d", timePicker.getCurrentMinute()));
+            startTime.setText("오전 " + curren_time + ":" + String.format("%02d", timePicker.getCurrentMinute()));
         }
         else if(timePicker.getCurrentHour() == 12) {
-            startTime.setText("오후 " + timePicker.getCurrentHour() + ":" + String.format("%02d", timePicker.getCurrentMinute()));
+            startTime.setText("오후 " + curren_time + ":" + String.format("%02d", timePicker.getCurrentMinute()));
         }
         else{
-            startTime.setText("오후 " + (timePicker.getCurrentHour() - 12) + ":" + String.format("%02d", timePicker.getCurrentMinute()));
+            startTime.setText("오후 " + (curren_time - 12) + ":" + String.format("%02d", timePicker.getCurrentMinute()));
         }
 
         if(timePicker2.getCurrentHour() < 12) {
-            endTime.setText("오전 " + timePicker2.getCurrentHour() + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
+            endTime.setText("오전 " + (curren_time + 1) + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
         }
         else if(timePicker2.getCurrentHour() == 12) {
-            endTime.setText("오후 " + timePicker2.getCurrentHour() + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
+            endTime.setText("오후 " + (curren_time + 1) + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
         }
         else{
-            endTime.setText("오후 " + (timePicker2.getCurrentHour() - 12) + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
+            endTime.setText("오후 " + ((curren_time + 1) - 12) + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
         }
+
+        timePicker2.setCurrentHour(curren_time + 1); //timepicker 시간 설정
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
@@ -137,6 +148,37 @@ public class ScheduleWriteActivity extends AppCompatActivity {
                 else{
                     endTime.setText("오후 " + (timePicker2.getCurrentHour() - 12) + ":" + String.format("%02d", timePicker2.getCurrentMinute()));
                 }
+            }
+        });
+
+
+        store = findViewById(R.id.store);
+        title = findViewById(R.id.title);
+        memo = findViewById(R.id.memo);
+        diaryDBHelper = new DiaryDBHelper(this);
+        store.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String start_date = startDate.getText().toString() + " " + startTime.getText().toString();
+                String end_date = endDate.getText().toString() + " " + endTime.getText().toString();
+                String t = title.getText().toString();
+                String m = memo.getText().toString();
+
+                if (t.equals("") && m.equals("")){
+                    Toast.makeText(getApplicationContext(),"입력한 정보가 없어 저장되지 않았습니다.", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    diaryDBHelper.schedule_insert(start_date, end_date, t, m);
+                }
+                finish();
+            }
+        });
+
+        cancel = findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 

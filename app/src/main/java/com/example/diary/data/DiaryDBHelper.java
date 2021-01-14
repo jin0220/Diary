@@ -12,8 +12,11 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
 
     public static String DATABASE_NAME = "Diary.db"; //데이터베이스 이름
     public static int VERSION = 1; //데이터베이스 버전
+
+    //테이블 명
     public static String TABLE_DIARY= "diary_table";
     public static String TABLE_IMAGE = "image_table";
+    public static String TABLE_SCHEDULE = "schedule_table";
 
     //속성명(diary_table)
     public static String _ID = "_id";
@@ -36,6 +39,11 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
     public static String IMAGE9 = "image9";
     public static String IMAGE10 = "image10";
 
+    //속성명(schedule_table)
+    public static String MEMO = "memo";
+    public static String START_DATE = "start_date";
+    public static String END_DATE = "end_date";
+
 
     SQLiteDatabase sqLiteDatabase;
 
@@ -51,7 +59,7 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String diary_table = "create table if not exists " + TABLE_DIARY + "("
                 + _ID + " integer PRIMARY KEY autoincrement, "
-                +  DATE  +" DATE, "
+                + DATE + " DATE, "
                 + TITLE + " TEXT, "
                 + IMAGE + " TEXT, "
                 + IMAGE_CODE + " TEXT, "
@@ -71,9 +79,17 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
                 + IMAGE9 + " TEXT, "
                 + IMAGE10 + " TEXT)";
 
+        String schedule_table = "create table if not exists " + TABLE_SCHEDULE + "("
+                + _ID + " integer PRIMARY KEY autoincrement, "
+                + START_DATE + " DATE, "
+                + END_DATE + " DATE, "
+                + TITLE + " TEXT, "
+                + MEMO + " TEXT)";
+
         try {
             sqLiteDatabase.execSQL(diary_table);
             sqLiteDatabase.execSQL(image_table);
+            sqLiteDatabase.execSQL(schedule_table);
         }catch (Exception e){
             Log.e("Database","Exception in CREATE_SQL", e);
         }
@@ -88,6 +104,7 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
             try {
                 sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DIARY);
                 sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_IMAGE);
+                sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_SCHEDULE);
             }catch (Exception e){
                 Log.e("Database","Exception in  UPGRADE_SQL", e);
             }
@@ -212,5 +229,18 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
 
     public Boolean image_delete(String code){
         return sqLiteDatabase.delete(TABLE_IMAGE, "image_code = '" + code + "'", null) > 0;
+    }
+
+    //schedule_table
+    public void schedule_insert(String start_date, String end_date, String title, String memo){
+        sqLiteDatabase = getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(START_DATE, start_date);
+        values.put(END_DATE, end_date);
+        values.put(TITLE, title);
+        values.put(MEMO, memo);
+
+        sqLiteDatabase.insert(DiaryDBHelper.TABLE_SCHEDULE, null, values); //레코드 삽입
     }
 }

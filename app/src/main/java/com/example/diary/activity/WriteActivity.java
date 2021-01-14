@@ -50,7 +50,7 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     int GET_CAPTURE_IMAGE = 201;
 
     TextView title, content, date_text;
-    Button gallery, camera, store;
+    Button gallery, camera, store, cancel;
     ImageView[] imageViews = new ImageView[10];
     int[] imageViewId = {R.id.photo1, R.id.photo2, R.id.photo3, R.id.photo4, R.id.photo5, R.id.photo6, R.id.photo7, R.id.photo8, R.id.photo9, R.id.photo10};
     ArrayList<Uri> imageUris;
@@ -143,13 +143,20 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                     else if(currentPhotoPath != null) {
                         imagePath.set(0, currentPhotoPath);
                     }
+
                     String image_code = null;
                     if(imagePath.get(0) != null) {
                         image_code = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
                         diaryDBHelper.image_insert(image_code, imagePath.get(0), imagePath.get(1), imagePath.get(2), imagePath.get(3), imagePath.get(4),
                                 imagePath.get(5), imagePath.get(6), imagePath.get(7), imagePath.get(8), imagePath.get(9));
                     }
-                    diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
+
+                    if (t.equals("") && imagePath.get(0) == null && c.equals("")){
+                        Toast.makeText(getApplicationContext(), "입력한 정보가 없어 저장되지 않았습니다.", Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
+                    }
                 }
                 else { //수정  (사진을 지우는 것도 가능하게 수정하기)
                     ArrayList<String> imagePath = new ArrayList<>();
@@ -196,6 +203,14 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 MainActivity.mainActivity.finish();
+                finish();
+            }
+        });
+
+        cancel = findViewById(R.id.cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 finish();
             }
         });

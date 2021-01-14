@@ -1,13 +1,22 @@
 package com.example.diary.data;
 
 public class CalendarListData {
-    String text;
+    String title;
+    String time;
 
     public String getText() {
-        return text;
+        return title;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setText(String title) {
+        this.title = title;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

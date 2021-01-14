@@ -154,6 +154,7 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/cancel"
                     android:layout_width="180dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/btn2_pressed"

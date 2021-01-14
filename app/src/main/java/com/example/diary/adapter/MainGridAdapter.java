@@ -156,31 +156,31 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
         String[] date = text.split(" ");
         String[] day = date[2].split("일");
         switch (date[1]){
-            case "1월":
+            case "01월":
                 date[1] = "Jan.";
                 break;
-            case "2월":
+            case "02월":
                 date[1] = "Feb.";
                 break;
-            case "3월":
+            case "03월":
                 date[1] = "Mar.";
                 break;
-            case "4월":
+            case "04월":
                 date[1] = "Apr.";
                 break;
-            case "5월":
+            case "05월":
                 date[1] = "May.";
                 break;
-            case "6월":
+            case "06월":
                 date[1] = "Jun.";
                 break;
-            case "7월":
+            case "07월":
                 date[1] = "Jul.";
                 break;
-            case "8월":
+            case "08월":
                 date[1] = "Aug.";
                 break;
-            case "9월":
+            case "09월":
                 date[1] = "Sep.";
                 break;
             case "10월":
