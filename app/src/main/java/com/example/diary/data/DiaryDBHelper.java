@@ -243,4 +243,17 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.insert(DiaryDBHelper.TABLE_SCHEDULE, null, values); //레코드 삽입
     }
+
+    public Boolean schedule_delete(String id){
+        return sqLiteDatabase.delete(TABLE_SCHEDULE, "_id = " + id, null) > 0;
+    }
+
+    public boolean schedule_update(String id, String start_date, String end_date, String title, String memo){
+        ContentValues values = new ContentValues();
+        values.put(START_DATE, start_date);
+        values.put(END_DATE, end_date);
+        values.put(TITLE, title);
+        values.put(MEMO, memo);
+        return sqLiteDatabase.update(TABLE_SCHEDULE, values, "_id=" + id, null) > 0;
+    }
 }

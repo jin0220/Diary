@@ -1,5 +1,6 @@
 package com.example.diary.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.diary.R;
+import com.example.diary.activity.ScheduleViewActivity;
 import com.example.diary.activity.ScheduleWriteActivity;
 import com.example.diary.adapter.CalendarListAdapter;
 import com.example.diary.data.DiaryDBHelper;
@@ -34,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+
 public class CalendarFragment extends Fragment {
 
     TextView schedule;
@@ -44,6 +48,9 @@ public class CalendarFragment extends Fragment {
     ListView schedule_list;
     FloatingActionButton floatingActionButton;
     String click_date;
+    int ADD_REQUEST = 1;
+    int VIEW_REQUEST = 2;
+    int select_list;
 
 
     @Nullable
@@ -59,6 +66,11 @@ public class CalendarFragment extends Fragment {
         schedule = rootView.findViewById(R.id.schedule);
 
         diaryDBHelper = new DiaryDBHelper(getActivity());
+
+        schedule_page = rootView.findViewById(R.id.schedule_view);
+        schedule_list = rootView.findViewById(R.id.schedule_list);
+
+
 //        Cursor cursor = diaryDBHelper.select();
 //        ArrayList<CalendarDay> calendarDayArrayList = new ArrayList<>();
 //
@@ -73,26 +85,14 @@ public class CalendarFragment extends Fragment {
 //            calendarDayArrayList.add(calendarDay);
 //        }
 
-        Cursor cursor3 = diaryDBHelper.select_sql("select * from schedule_table");
-        ArrayList<CalendarDay> scheduleArrayList = new ArrayList<>();
-
-        while (cursor3.moveToNext()) {
-            String date = cursor3.getString(cursor3.getColumnIndexOrThrow(diaryDBHelper.START_DATE));
-            String[] d = date.split(" ");
-            String year = d[0].split("년")[0];
-            String month = d[1].split("월")[0];
-            String day = d[2].split("일")[0];
-
-            CalendarDay calendarDay = CalendarDay.from(Integer.valueOf(year), Integer.valueOf(month) - 1, Integer.valueOf(day));
-            scheduleArrayList.add(calendarDay);
-        }
+        schedule_dot(); //달력에 일정 표시
 
         schedule.setText(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "일의 일정");
 
         calendar.addDecorators(new SaturdayDecorator(),
-                new SundayDecorator(),
+                new SundayDecorator()
 //                                new SelectorDecorator(getActivity()),
-                new EventDecorator(Color.BLUE, scheduleArrayList));
+                );
 
         //달력 년/월 표시
         calendar.setTitleFormatter(new TitleFormatter() {
@@ -122,10 +122,19 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-        schedule_page = rootView.findViewById(R.id.schedule_view);
-        schedule_list = rootView.findViewById(R.id.schedule_list);
-
         schedule_db();
+
+        schedule_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                TextView title = view.findViewById(R.id.schedule_title);
+                Intent intent = new Intent(getActivity(), ScheduleViewActivity.class);
+                intent.putExtra("date", click_date);
+                intent.putExtra("title", title.getText());
+                select_list = (int)calendarListAdapter.getItemId(i); //일정 수정 및 삭제하기 위해 해당 아이템 position 저장
+                startActivityForResult(intent, VIEW_REQUEST);
+            }
+        });
 
         SlidingUpPanelLayout slidingUpPanelLayout = rootView.findViewById(R.id.slidinguppanel);
         slidingUpPanelLayout.setDragView(rootView.findViewById(R.id.schedule)); //패널 열기위해 드래그하는 위치
@@ -135,7 +144,9 @@ public class CalendarFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), ScheduleWriteActivity.class);
-                startActivity(intent);
+                intent.putExtra("date", click_date);
+                intent.putExtra("modify", false);
+                startActivityForResult(intent, ADD_REQUEST);
             }
         });
 
@@ -143,7 +154,24 @@ public class CalendarFragment extends Fragment {
 
     }
 
-    private void schedule_db() {
+    public void schedule_dot(){
+        Cursor cursor3 = diaryDBHelper.select_sql("select * from schedule_table");
+        ArrayList<CalendarDay> scheduleArrayList = new ArrayList<>();
+
+        while (cursor3.moveToNext()) {
+            String date = cursor3.getString(cursor3.getColumnIndexOrThrow(diaryDBHelper.START_DATE));
+            String[] d = date.split(" ");
+            String year = d[0].split("년")[0];
+            String month = d[1].split("월")[0];
+            String day = d[2].split("일")[0];
+
+            CalendarDay calendarDay = CalendarDay.from(Integer.valueOf(year), Integer.valueOf(month) - 1, Integer.valueOf(day));
+            scheduleArrayList.add(calendarDay);
+        }
+        calendar.addDecorator(new EventDecorator(Color.BLUE, scheduleArrayList));
+    }
+
+    public void schedule_db() {
         calendarListAdapter = new CalendarListAdapter();
         schedule_list.setAdapter(calendarListAdapter);
 
@@ -161,4 +189,24 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        if(requestCode == ADD_REQUEST && resultCode == Activity.RESULT_OK){
+            String title = intent.getExtras().get("title").toString();
+            String time = intent.getExtras().get("time").toString();
+            calendarListAdapter.addData(title, time);
+            calendarListAdapter.notifyDataSetChanged(); //리스트뷰 갱신
+            schedule_dot();
+        }
+        else if(requestCode == VIEW_REQUEST && resultCode == Activity.RESULT_OK){
+            if(intent.getExtras().getInt("state") == 1) {
+                calendarListAdapter.remove(select_list); //일정 삭제하기
+            }
+            else if(intent.getExtras().getInt("state") == 2){
+                String title = intent.getExtras().get("title").toString();
+                String time = intent.getExtras().get("time").toString();
+                calendarListAdapter.modify(select_list, title, time);
+            }
+        }
+    }
 }

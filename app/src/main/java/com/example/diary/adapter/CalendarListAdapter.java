@@ -18,6 +18,8 @@ public class CalendarListAdapter extends BaseAdapter {
 
     ArrayList<CalendarListData> items = new ArrayList<>();
 
+    CalendarListData calendarListData;
+
     public CalendarListAdapter() {
 
     }
@@ -47,7 +49,7 @@ public class CalendarListAdapter extends BaseAdapter {
         schedule_title = view.findViewById(R.id.schedule_title);
         schedule_time = view.findViewById(R.id.schedule_time);
 
-        CalendarListData calendarListData = items.get(position);
+        calendarListData = items.get(position);
 
         schedule_title.setText(calendarListData.getText());
         schedule_time.setText(calendarListData.getTime());
@@ -62,5 +64,18 @@ public class CalendarListAdapter extends BaseAdapter {
         calendarListData.setTime(time);
 
         items.add(calendarListData);
+    }
+
+    public void remove(int position){
+        items.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public void modify(int position, String title, String time){
+        CalendarListData calendarListData = new CalendarListData();
+        calendarListData.setText(title);
+        calendarListData.setTime(time);
+        items.set(position, calendarListData);
+        notifyDataSetChanged();
     }
 }

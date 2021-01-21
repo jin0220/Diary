@@ -17,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ScheduleWriteActivity"></activity>
+        <activity android:name=".activity.ScheduleViewActivity"></activity>
+        <activity android:name=".activity.ScheduleWriteActivity" />
         <activity android:name=".activity.PasswordActivity" />
         <activity
             android:name=".activity.SettingsActivity"
