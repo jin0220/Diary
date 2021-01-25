@@ -56,4 +56,10 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         return view;
     }
+
+    //뷰페이저가 갱신될 때 원래 있던 뷰 삭제
+    @Override
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        container.removeView((View) object);
+    }
 }

@@ -1,7 +1,6 @@
 package com.example.diary.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.diary.R;
-import com.example.diary.activity.ReadActivity;
 import com.example.diary.data.MainGridData;
 
 import java.util.ArrayList;
@@ -26,6 +24,19 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
     public static final int ITEM_VIEW = 1;
 
     ArrayList<MainGridData> items = new ArrayList<>();
+
+    //MainFragment에서 아이템 클릭 이벤트를 처리하기 위한 커스텀 리스너
+    public interface OnItemClickListener {
+        void onItemClick(View v, int position) ;
+    }
+
+    // 리스너 객체 참조를 저장하는 변수
+    private OnItemClickListener mListener = null ;
+
+    // OnItemClickListener 리스너 객체 참조를 어댑터에 전달하는 메서드
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mListener = listener ;
+    }
 
     public  class HeaderView extends MainGridAdapter.ViewHolder{
 
@@ -57,12 +68,20 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다면 앞에 getActivity() 붙여줌
-                    int position = getAdapterPosition();
-                    MainGridData data = (MainGridData) items.get(position);
-                    intent.putExtra("id", data.getId());
-                    v.getContext().startActivity(intent);
+//                    Intent intent = new Intent(v.getContext(), ReadActivity.class);//인텐트 안에서 getApplicationContext()가 에러 난다면 앞에 getActivity() 붙여줌
+//                    int position = getAdapterPosition();
+//                    select_position = position;
+//                    MainGridData data = (MainGridData) items.get(position);
+//                    intent.putExtra("id", data.getId());
+//                    v.getContext().startActivity(intent);
 //                    ((Activity)v.getContext()).finish();
+                    int position = getAdapterPosition(); //클릭한 아이템 위치
+                    if (position != RecyclerView.NO_POSITION) { //뷰홀더가 참조하는 아이템이 어댑터에서 삭제되면 getAdapterPosition() 메서드는 NO_POSITION을 리턴하기 때문
+                        // 리스너 객체의 메서드 호출.
+                        if (mListener != null) {
+                            mListener.onItemClick(v, position);
+                        }
+                    }
                 }
             });
         }
@@ -125,9 +144,12 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
         return items.get(position).getViewType();
     }
 
+    public String getItem(int position) {
+        return items.get(position).getId();
+    }
+
     //grid
     public void addData(String id, String text, Uri image, int viewType){
-
         MainGridData item = new MainGridData();
 
         String date = convert(text);
@@ -150,6 +172,12 @@ public class MainGridAdapter extends RecyclerView.Adapter<MainGridAdapter.ViewHo
 
         items.add(item);
 
+    }
+
+    public void remove(int position){
+        items.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, items.size());
     }
 
     private String convert(String text) {

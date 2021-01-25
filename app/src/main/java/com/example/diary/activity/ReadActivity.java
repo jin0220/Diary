@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
@@ -23,6 +24,7 @@ import com.example.diary.R;
 import com.example.diary.adapter.SpinnerAdapter;
 import com.example.diary.adapter.ViewPagerAdapter;
 import com.example.diary.data.DiaryDBHelper;
+import com.example.diary.fragment.MainFragment;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -38,8 +40,11 @@ public class ReadActivity extends AppCompatActivity {
     int count;
     ViewPagerAdapter viewPagerAdapter;
     ArrayList<Uri> photos;
+    ArrayList<String> im;
     TabLayout tabLayout;
     String image_code;
+    int position;
+    int MODIFY_REQUEST = 1;
 
     public static Activity readActivity;
 
@@ -74,6 +79,7 @@ public class ReadActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         id = intent.getExtras().getString("id");
+        position = intent.getExtras().getInt("position");
 
         String sql = "select * from " + diaryDBHelper.TABLE_DIARY + " d left outer join " + diaryDBHelper.TABLE_IMAGE
                 + " i on d." + diaryDBHelper.IMAGE_CODE + " = i." + diaryDBHelper.IMAGE_CODE + " where _id = " + "'" + id + "'";
@@ -86,7 +92,7 @@ public class ReadActivity extends AppCompatActivity {
             date = cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.DATE));
             count = cursor.getInt(cursor.getColumnIndexOrThrow(diaryDBHelper.FAVORITE));
 
-            ArrayList<String> im = new ArrayList<>();
+            im = new ArrayList<>();
             int j = 1;
             while (j <= 10) {
                 if (cursor.getString(cursor.getColumnIndexOrThrow(diaryDBHelper.IMAGE + j)) != null)
@@ -108,18 +114,7 @@ public class ReadActivity extends AppCompatActivity {
             content.setText(c);
         }
 
-        //사진인 없을 경우 사진영역을 없앰
-        if(image_code == null) {
-            viewPager.setVisibility(View.GONE);
-        }else {
-            viewPager.setOffscreenPageLimit(10); //ViewPager가 상태를 유지할 페이지의 최대 갯수를 변경할 수 있게 해준다.(limit를 넘어간 page에 대해서는 죽이고, 선택되었을 때 다시 create한다)
-
-            viewPagerAdapter = new ViewPagerAdapter(photos, this);
-            viewPager.setAdapter(viewPagerAdapter);
-
-            tabLayout = findViewById(R.id.indicator);
-            tabLayout.setupWithViewPager(viewPager, true); //viewpager와 tabLayout 연결
-        }
+        viewPager(photos);
 
         cursor.close();
 
@@ -151,6 +146,21 @@ public class ReadActivity extends AppCompatActivity {
         Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
 
         return uri;
+    }
+
+    public void viewPager(ArrayList<Uri> photos){
+        //사진인 없을 경우 사진영역을 없앰
+        if(image_code == null) {
+            viewPager.setVisibility(View.GONE);
+        }else {
+            viewPager.setOffscreenPageLimit(10); //ViewPager가 상태를 유지할 페이지의 최대 갯수를 변경할 수 있게 해준다.(limit를 넘어간 page에 대해서는 죽이고, 선택되었을 때 다시 create한다)
+
+            viewPagerAdapter = new ViewPagerAdapter(photos, this);
+            viewPager.setAdapter(viewPagerAdapter);
+
+            tabLayout = findViewById(R.id.indicator);
+            tabLayout.setupWithViewPager(viewPager, true); //viewpager와 tabLayout 연결
+        }
     }
 
 
@@ -188,19 +198,50 @@ public class ReadActivity extends AppCompatActivity {
             case R.id.delete:
                 diaryDBHelper.delete(id);
                 diaryDBHelper.image_delete(image_code);
-                intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                MainActivity.mainActivity.finish();
+                intent = new Intent(getApplicationContext(), MainFragment.class);
+                intent.putExtra("position", position);
+                intent.putExtra("state", "remove");
+                setResult(RESULT_OK, intent);
+//                startActivity(intent);
+//                MainActivity.mainActivity.finish();
                 finish();
                 return true;
             case R.id.modify:
                 intent = new Intent(this, WriteActivity.class);
                 intent.putExtra("modify",true);
                 intent.putExtra("id",id);
-                startActivity(intent);
+                startActivityForResult(intent, MODIFY_REQUEST);
 //                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if(requestCode == MODIFY_REQUEST && resultCode == RESULT_OK){
+
+            String t = intent.getExtras().getString("title");
+            String c = intent.getExtras().getString("content");
+            photos = new ArrayList<>();
+            im = new ArrayList<>();
+            im = intent.getExtras().getStringArrayList("photo");
+
+            int k = 0;
+            while (k < im.size()) {
+                if (im.get(k) != null)
+                    photos.add(getUriFromPath(im.get(k)));
+                else break;
+                k++;
+            }
+
+            if(im.get(0) != null){
+                image_code = im.get(0);
+            }
+            viewPager(photos); //오류
+            title.setText(t);
+            content.setText(c);
+        }
     }
 }

@@ -63,29 +63,15 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
     int image_ch = 1;
     int year, month, day;
     String i_c; //수정할 때 이미지 코드값 저장할 변수
+    ArrayList<String> imagePath = new ArrayList<>();
 
     DiaryDBHelper diaryDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
 
-        if(sharedPreferences.getBoolean("mode",false) == true){
-            setTheme(R.style.DarkTheme);
-        }else{
-            setTheme(R.style.AppTheme);
-        }
-        setContentView(R.layout.activity_write);
-
-        AutoPermissions.Companion.loadAllPermissions(this, 101); //권한
-
-        diaryDBHelper = new DiaryDBHelper(this);
-
-        for (int i = 0; i < 10; i++) {
-            imageViews[i] = findViewById(imageViewId[i]);
-        }
-        gallery = findViewById(R.id.gallery);
+        init();
 
         //갤러리에서 이미지 가져오기
         gallery.setOnClickListener(new View.OnClickListener() {
@@ -99,8 +85,6 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             }
         });
 
-        camera = findViewById(R.id.camera);
-
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,25 +92,15 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
             }
         });
 
-        title = findViewById(R.id.title);
-        content = findViewById(R.id.content);
-
-        store = findViewById(R.id.store);
-
-        date_text = findViewById(R.id.date_text);
-
-
         store.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String t = title.getText().toString();
                 String c = content.getText().toString();
                 String date = date_text.getText().toString();
-//                String day = String.format("%02d")date.split(" ")[2].split("일")[0];
-
 
                 if (store_state == 0) { //새로 작성
-                    ArrayList<String> imagePath = new ArrayList<>();
+//                    ArrayList<String> imagePath = new ArrayList<>();
                     int j = 0;
                     while (j < 10) {
                         imagePath.add(null);
@@ -157,9 +131,14 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                     else {
                         diaryDBHelper.insert(t, imagePath.get(0), c, date, image_code);
                     }
+
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                setResult(RESULT_OK, intent);
+                    startActivity(intent);
+                    MainActivity.mainActivity.finish();
                 }
                 else { //수정  (사진을 지우는 것도 가능하게 수정하기)
-                    ArrayList<String> imagePath = new ArrayList<>();
+//                    ArrayList<String> imagePath = new ArrayList<>();
                     int j = 0;
                     while (j < 10) {
                         imagePath.add(null);
@@ -197,17 +176,23 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                     else{ //사진이 없던 상태에서 사진 추가 없이 글만 수정할 경우
                         diaryDBHelper.update(id, t, imagePath.get(0), c, date, i_c);
                     }
-                    ReadActivity.readActivity.finish();
+//                    ReadActivity.readActivity.finish();
+                    Intent intent = new Intent(WriteActivity.this, ReadActivity.class);
+                    intent.putExtra("title", t);
+                    intent.putExtra("content", c);
+                    intent.putExtra("photo", imagePath);
+                    Log.d("확인", "글쓰기");
+                    setResult(RESULT_OK, intent);
+//                    startActivity(intent);
+//                    MainActivity.mainActivity.finish();
                 }
 
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                MainActivity.mainActivity.finish();
+
                 finish();
             }
         });
 
-        cancel = findViewById(R.id.cancel);
+
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -282,6 +267,33 @@ public class WriteActivity extends AppCompatActivity implements AutoPermissionsL
                 new DatePickerDialog(WriteActivity.this, AlertDialog.THEME_HOLO_LIGHT, listener, year, month, day).show();
             }
         });
+    }
+
+    public void init(){
+        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
+
+        if(sharedPreferences.getBoolean("mode",false) == true){
+            setTheme(R.style.DarkTheme);
+        }else{
+            setTheme(R.style.AppTheme);
+        }
+        setContentView(R.layout.activity_write);
+
+        AutoPermissions.Companion.loadAllPermissions(this, 101); //권한
+
+        diaryDBHelper = new DiaryDBHelper(this);
+
+        for (int i = 0; i < 10; i++) {
+            imageViews[i] = findViewById(imageViewId[i]);
+        }
+
+        gallery = findViewById(R.id.gallery);
+        camera = findViewById(R.id.camera);
+        title = findViewById(R.id.title);
+        content = findViewById(R.id.content);
+        store = findViewById(R.id.store);
+        date_text = findViewById(R.id.date_text);
+        cancel = findViewById(R.id.cancel);
     }
 
     //datepicker

@@ -1,5 +1,6 @@
 package com.example.diary.fragment;
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.diary.R;
+import com.example.diary.activity.ReadActivity;
 import com.example.diary.activity.WriteActivity;
 import com.example.diary.adapter.MainGridAdapter;
 import com.example.diary.data.DiaryDBHelper;
@@ -31,6 +33,9 @@ public class MainFragment extends Fragment {
 
     public static final int HEADER_VIEW = 0;
     public static final int ITEM_VIEW = 1;
+
+    int WRITE_REQUEST = 1;
+    int READ_REQUEST = 2;
 
 //    public static Fragment mainfragment;
 
@@ -78,7 +83,7 @@ public class MainFragment extends Fragment {
                 adapter.addData(id, date, uriImage, ITEM_VIEW);
             }else{
 
-                adapter.addData2(dateCombination,HEADER_VIEW);
+                adapter.addData2(dateCombination, HEADER_VIEW);
                 adapter.addData(id, date, uriImage, ITEM_VIEW);
 
             }
@@ -86,6 +91,16 @@ public class MainFragment extends Fragment {
         }
 
         cursor.close();
+
+        adapter.setOnItemClickListener(new MainGridAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Intent intent = new Intent(getActivity(), ReadActivity.class);
+                intent.putExtra("id", adapter.getItem(position));
+                intent.putExtra("position", position);
+                startActivityForResult(intent, READ_REQUEST);
+            }
+        });
 
         //위치별로 차지할 폭을 결정한다
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -104,9 +119,10 @@ public class MainFragment extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), WriteActivity.class);
                 intent.putExtra("modify",false);
-                startActivity(intent);
+                startActivityForResult(intent, WRITE_REQUEST);
             }
         });
+
 
         return rootView;
     }
@@ -122,5 +138,19 @@ public class MainFragment extends Fragment {
         int id = cursor.getInt(cursor.getColumnIndex("_id"));
         Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
         return uri;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if(requestCode == READ_REQUEST && resultCode == Activity.RESULT_OK){
+            String state = intent.getExtras().get("state").toString();
+            if(state.equals("remove")){
+                int position = intent.getExtras().getInt("position");
+                adapter.remove(position);
+            }
+        }
+
+
     }
 }
