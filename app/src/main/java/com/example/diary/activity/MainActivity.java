@@ -3,9 +3,12 @@ package com.example.diary.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,15 +17,22 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.diary.R;
+import com.example.diary.data.DiaryDBHelper;
 import com.example.diary.fragment.CalendarFragment;
 import com.example.diary.fragment.MainFragment;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     MainFragment mainFragment;
     CalendarFragment calendarFragment;
+
+    DiaryDBHelper diaryDBHelper;
+
+    TextView total, favorite, today;
 
     public static Activity mainActivity;
 
@@ -60,6 +70,30 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+        View header = navigationView.getHeaderView(0);
+
+        total = header.findViewById(R.id.total);
+        favorite = header.findViewById(R.id.favorite);
+        today = header.findViewById(R.id.today);
+
+        diaryDBHelper = new DiaryDBHelper(this);
+
+
+        Cursor cursor1 = diaryDBHelper.select();
+        String t = Integer.toString(cursor1.getCount()); //레코드 개수 반환
+        total.setText(t);
+
+        String sql = "select favorite from diary_table where favorite = 1";
+        Cursor cursor2 = diaryDBHelper.select_sql(sql);
+        String f = Integer.toString(cursor2.getCount()); //레코드 개수 반환 (좋아요를 누르고 메인으로 돌아갔을 때 값도 바로 바뀔 수 있게 수정하기)
+        favorite.setText(f);
+
+        String click_date = Calendar.getInstance().get(Calendar.YEAR) + "년 " + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "월 " + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "일";
+        String sql2 = "select * from " + diaryDBHelper.TABLE_SCHEDULE + " where start_date like " + "'" + click_date + "%'";
+        Cursor cursor3 = diaryDBHelper.select_sql(sql2);
+        String day = Integer.toString(cursor3.getCount()); //레코드 개수 반환
+        today.setText(day);
 
         mainFragment = new MainFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.container,mainFragment).commit(); //프래그먼트 생성

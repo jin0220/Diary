@@ -1,6 +1,7 @@
 package com.example.diary.activity;
 
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +43,22 @@ public class PasswordActivity extends AppCompatActivity {
         ((Button) findViewById(R.id.num7)).setOnClickListener(btnListener);
         ((Button) findViewById(R.id.num8)).setOnClickListener(btnListener);
         ((Button) findViewById(R.id.num9)).setOnClickListener(btnListener);
+
+        ((Button) findViewById(R.id.clear))
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        clearFields();
+                    }
+                });
+
+        ((Button) findViewById(R.id.delete_key))
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onDeleteKey();
+                    }
+                });
 
     }
 
@@ -163,4 +180,43 @@ public class PasswordActivity extends AppCompatActivity {
             }
         }
     };
+
+    private View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            v.performClick();
+            clearFields();
+            return false;
+        }
+    };
+
+    private void clearFields() { //비밀번호 전체 지우기
+        password1.setText("");
+        password2.setText("");
+        password3.setText("");
+        password4.setText("");
+
+        password1.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                password1.requestFocus();
+            }
+        }, 200);
+    }
+
+    private void onDeleteKey() { //비밀번호 하나씩 지우기
+        if (password1.isFocused()) {
+
+        } else if (password2.isFocused()) {
+            password1.requestFocus();
+            password1.setText("");
+        } else if (password3.isFocused()) {
+            password2.requestFocus();
+            password2.setText("");
+        } else if (password4.isFocused()) {
+            password3.requestFocus();
+            password3.setText("");
+        }
+    }
 }
