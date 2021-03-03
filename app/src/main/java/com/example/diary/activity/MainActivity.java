@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -157,5 +158,27 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    boolean lock = true; //잠금 상태 확인
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AppLock appLock = new AppLock(this);
+        if(lock && appLock.isPassLockSet()){
+            Intent intent = new Intent(this, PasswordActivity.class);
+            intent.putExtra("type", AppLockConst.UNLOCK_PASSWORD);
+            startActivityForResult(intent, AppLockConst.UNLOCK_PASSWORD);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == AppLockConst.UNLOCK_PASSWORD && resultCode == Activity.RESULT_OK){
+            lock = false; //잠금 해제
+        }
     }
 }

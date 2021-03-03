@@ -21,6 +21,11 @@
             app:key="bio"
             app:title="지문" />
 
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="null"
+            app:title="설정 안 함" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
