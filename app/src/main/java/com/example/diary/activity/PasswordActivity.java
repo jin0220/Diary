@@ -3,10 +3,11 @@ package com.example.diary.activity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,7 +16,9 @@ import com.example.diary.R;
 public class PasswordActivity extends AppCompatActivity {
 
     EditText password1,password2, password3, password4;
+    TextView title;
     private String oldPasscode = null;
+    boolean change_pw = false; //비밀번호 변경 여부
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,8 @@ public class PasswordActivity extends AppCompatActivity {
                     }
                 });
 
+        title = findViewById(R.id.title);
+
     }
 
     protected void onPasscodeInputed(int type) {
@@ -76,27 +81,31 @@ public class PasswordActivity extends AppCompatActivity {
         password4.setText("");
         password1.requestFocus();
 
+
+
         AppLock appLock = new AppLock(this);
+
+        //잠금 설정이 되어 있으면서 다시 잠금 설정을 할 경우
+        if(type == AppLockConst.ENABLE_PASSLOCK && appLock.isPassLockSet()){
+            type = AppLockConst.CHANGE_PASSWORD;
+        }
+
+        TextView text = findViewById(R.id.again);
         switch (type) {
             case AppLockConst.ENABLE_PASSLOCK: //잠금 설정
                 if (oldPasscode == null) {
-//                    tvMessage.setText(R.string.reenter_passcode);
                     oldPasscode = passLock;
                     clearFields();
-                    TextView text = findViewById(R.id.again);
                     text.setVisibility(View.VISIBLE);
                 } else {
                     if (passLock.equals(oldPasscode)) {
                         setResult(RESULT_OK);
-//                        LockManager.getInstance().getAppLock()
-//                                .setPasscode(passLock);
-
                         appLock.setPassLock(passLock);
                         finish();
                     } else {
                         oldPasscode = null;
-//                        tvMessage.setText(R.string.enter_passcode);
-//                        onPasscodeError();
+                        text.setVisibility(View.GONE);
+                        onPasscodeError();
                     }
                 }
                 break;
@@ -110,23 +119,39 @@ public class PasswordActivity extends AppCompatActivity {
                     }
                 }
                 break;
-//
-//            case AppLockConst.CHANGE_PASSWORD:
-//                if (LockManager.getInstance().getAppLock().checkPasscode(passLock)) {
-//                    tvMessage.setText(R.string.enter_passcode);
-//                    type = AppLockConst.ENABLE_PASSLOCK;
-//                } else {
-//                    onPasscodeError();
-//                }
-//                break;
+
+            case AppLockConst.CHANGE_PASSWORD: //비밀 번호 변경
+                if (appLock.checkPassLock(passLock) && !change_pw) {
+                    title.setText("비밀번호 변경");
+                    change_pw = true;
+                }
+                else if(change_pw) {
+                    if (oldPasscode == null) {
+                        oldPasscode = passLock;
+                        clearFields();
+                        text.setVisibility(View.VISIBLE);
+                    } else {
+                        if (passLock.equals(oldPasscode)) {
+                            setResult(RESULT_OK);
+                            appLock.setPassLock(passLock);
+                            finish();
+                        } else {
+                            oldPasscode = null;
+                            text.setVisibility(View.GONE);
+                            onPasscodeError();
+                        }
+                    }
+                } else {
+                    onPasscodeError();
+                }
+                break;
 
             case AppLockConst.UNLOCK_PASSWORD:
                 if (appLock.checkPassLock(passLock)) {
                     setResult(RESULT_OK);
                     finish();
                 } else {
-//                    onPasscodeError();
-                    Toast.makeText(this, "비밀번호가 틀립니다.",Toast.LENGTH_LONG).show();
+                    onPasscodeError();
                 }
                 break;
 
@@ -135,6 +160,21 @@ public class PasswordActivity extends AppCompatActivity {
         }
     }
 
+    protected void onPasscodeError() {
+        Thread thread = new Thread() {
+            public void run() {
+                Animation animation = AnimationUtils.loadAnimation(
+                        PasswordActivity.this, R.anim.shake);
+                findViewById(R.id.title).startAnimation(animation);
+                password1.setText("");
+                password2.setText("");
+                password3.setText("");
+                password4.setText("");
+                password1.requestFocus();
+            }
+        };
+        runOnUiThread(thread);
+    }
 
     private View.OnClickListener btnListener = new View.OnClickListener() {
         @Override
