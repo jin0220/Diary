@@ -18,12 +18,10 @@ public class pwPreferenceFragment extends PreferenceFragmentCompat {
     public pwPreferenceFragment(){
 
     }
-Preference pw;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.pw_preference, rootKey);
-
-        pw = findPreference("pw");
     }
 
     @Override
@@ -34,6 +32,12 @@ Preference pw;
             Intent intent = new Intent(getContext(), PasswordActivity.class);
             intent.putExtra("type", AppLockConst.ENABLE_PASSLOCK);
             startActivityForResult(intent, AppLockConst.ENABLE_PASSLOCK);
+            return true;
+        }
+        else if(key.equals("bio")){
+            Intent intent = new Intent(getContext(), PasswordActivity.class);
+            intent.putExtra("bio", AppLockConst.BIO_PASSWORD);
+            startActivityForResult(intent, AppLockConst.BIO_PASSWORD);
             return true;
         }
         else if(key.equals("null")){
@@ -54,6 +58,9 @@ Preference pw;
         }
         if(requestCode == AppLockConst.DISABLE_PASSLOCK && resultCode == Activity.RESULT_OK){
             Toast.makeText(getContext(),"설정 안 함",Toast.LENGTH_LONG).show();
+        }
+        if(requestCode == AppLockConst.BIO_PASSWORD && resultCode == Activity.RESULT_OK){
+            Toast.makeText(getContext(),"지문 인식 설정",Toast.LENGTH_LONG).show();
         }
     }
 }

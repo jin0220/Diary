@@ -1,7 +1,7 @@
 package com.example.diary.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -9,21 +9,32 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 
 import com.example.diary.R;
 
+import java.util.concurrent.Executor;
+
 public class PasswordActivity extends AppCompatActivity {
 
+    //비밀번호
     EditText password1,password2, password3, password4;
     TextView title;
     private String oldPasscode = null;
     boolean change_pw = false; //비밀번호 변경 여부
 
+    //지문 인식
+    private Executor executor;
+    private BiometricPrompt biometricPrompt;
+    private BiometricPrompt.PromptInfo promptInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences("com.example.diary_preferences",MODE_PRIVATE);
 //
 //        if(sharedPreferences.getBoolean("mode",false) == true){
 //            setTheme(R.style.DarkTheme);
@@ -32,6 +43,7 @@ public class PasswordActivity extends AppCompatActivity {
 //        }
         setContentView(R.layout.activity_password);
 
+    //비밀번호
         password1 = findViewById(R.id.password1);
         password2 = findViewById(R.id.password2);
         password3 = findViewById(R.id.password3);
@@ -67,6 +79,17 @@ public class PasswordActivity extends AppCompatActivity {
 
         title = findViewById(R.id.title);
 
+        AppLock appLock = new AppLock(this);
+
+        if(getIntent().getIntExtra("bio", 0) == AppLockConst.BIO_PASSWORD){
+            setBiometricPrompt(true); //지문 인식
+            setResult(RESULT_OK);
+        }
+        if(sharedPreferences.getBoolean("biopassword",false) == true
+                && getIntent().getIntExtra("type", 0) == AppLockConst.DISABLE_PASSLOCK){
+            setBiometricPrompt(false);
+            setResult(RESULT_OK);
+        }
     }
 
     protected void onPasscodeInputed(int type) {
@@ -80,8 +103,6 @@ public class PasswordActivity extends AppCompatActivity {
         password3.setText("");
         password4.setText("");
         password1.requestFocus();
-
-
 
         AppLock appLock = new AppLock(this);
 
@@ -146,7 +167,7 @@ public class PasswordActivity extends AppCompatActivity {
                 }
                 break;
 
-            case AppLockConst.UNLOCK_PASSWORD:
+            case AppLockConst.UNLOCK_PASSWORD: //잠금 해제하기
                 if (appLock.checkPassLock(passLock)) {
                     setResult(RESULT_OK);
                     finish();
@@ -232,15 +253,6 @@ public class PasswordActivity extends AppCompatActivity {
         }
     };
 
-    private View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            v.performClick();
-            clearFields();
-            return false;
-        }
-    };
-
     private void clearFields() { //비밀번호 전체 지우기
         password1.setText("");
         password2.setText("");
@@ -269,5 +281,61 @@ public class PasswordActivity extends AppCompatActivity {
             password3.requestFocus();
             password3.setText("");
         }
+    }
+
+    protected void setBiometricPrompt(final boolean type){
+        final AppLock appLock = new AppLock(this);
+
+        executor = ContextCompat.getMainExecutor(this);
+        biometricPrompt = new BiometricPrompt(this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode,
+                                              @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+//                Toast.makeText(getApplicationContext(),
+//                        "에러", Toast.LENGTH_SHORT)
+//                        .show();
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(
+                    @NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+//                Toast.makeText(getApplicationContext(),
+//                        "성공", Toast.LENGTH_SHORT).show();
+                if(type)
+                    appLock.setBio();
+                else
+                    appLock.removeBio();
+                finish();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+//                Toast.makeText(getApplicationContext(), "실패",
+//                        Toast.LENGTH_SHORT)
+//                        .show();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("지문 인증")
+                .setSubtitle("기기에 등록된 지문을 이용하여 지문을 인증해주세요.")
+                .setNegativeButtonText("취소")
+                .setDeviceCredentialAllowed(false)
+                .build();
+
+        //  사용자가 다른 인증을 이용하길 원할 때 추가하기
+
+//        Button biometricLoginButton = findViewById(R.id.buttonAuthWithFingerprint);
+//        biometricLoginButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                biometricPrompt.authenticate(promptInfo);
+//            }
+//        });
+        biometricPrompt.authenticate(promptInfo);
     }
 }

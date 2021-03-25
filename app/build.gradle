@@ -41,4 +41,5 @@ dependencies {
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
 
     implementation 'com.github.pedroSG94:AutoPermissions:1.0.3'
+    implementation 'androidx.biometric:biometric:1.0.1'
 }

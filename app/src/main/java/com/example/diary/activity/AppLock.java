@@ -36,4 +36,14 @@ public class AppLock {
             return true;
         return false;
     }
+
+    public void setBio(){
+        editor.putBoolean("biopassword",true);
+        editor.apply(); //저장
+    }
+
+    public void removeBio(){
+        editor.remove("biopassword");
+        editor.apply();
+    }
 }

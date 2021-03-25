@@ -207,26 +207,26 @@ public class ScheduleWriteActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "입력한 정보가 없어 저장되지 않았습니다.", Toast.LENGTH_LONG).show();
                     } else {
                         diaryDBHelper.schedule_insert(start_date, end_date, t, m);
-                    }
 
-                    Intent intent = new Intent(getApplicationContext(), CalendarFragment.class);
-                    intent.putExtra("title",t);
-                    intent.putExtra("time", startTime.getText().toString() + " ~ " + endTime.getText().toString());
-                    setResult(RESULT_OK, intent);
+                        Intent intent = new Intent(getApplicationContext(), CalendarFragment.class);
+                        intent.putExtra("title", t);
+                        intent.putExtra("time", startTime.getText().toString() + " ~ " + endTime.getText().toString());
+                        setResult(RESULT_OK, intent);
+                    }
                 }
                 else {
                     if (t.equals("") && m.equals("")) {
                         Toast.makeText(getApplicationContext(), "입력한 정보가 없어 변경되지 않았습니다.", Toast.LENGTH_LONG).show();
                     } else {
                         diaryDBHelper.schedule_update(_id, start_date, end_date, t, m);
-                    }
 
-                    Intent intent = new Intent(getApplicationContext(), ScheduleViewActivity.class);
-                    intent.putExtra("title",t);
-                    intent.putExtra("start_date", start_date);
-                    intent.putExtra("end_date", end_date);
-                    intent.putExtra("memo", m);
-                    setResult(RESULT_OK, intent);
+                        Intent intent = new Intent(getApplicationContext(), ScheduleViewActivity.class);
+                        intent.putExtra("title", t);
+                        intent.putExtra("start_date", start_date);
+                        intent.putExtra("end_date", end_date);
+                        intent.putExtra("memo", m);
+                        setResult(RESULT_OK, intent);
+                    }
                 }
 
                 finish();

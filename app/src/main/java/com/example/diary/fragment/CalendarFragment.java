@@ -153,7 +153,7 @@ public class CalendarFragment extends Fragment {
         return rootView;
 
     }
-
+    EventDecorator eventDecorator;
     public void schedule_dot(){
         Cursor cursor3 = diaryDBHelper.select_sql("select * from schedule_table");
         ArrayList<CalendarDay> scheduleArrayList = new ArrayList<>();
@@ -168,7 +168,10 @@ public class CalendarFragment extends Fragment {
             CalendarDay calendarDay = CalendarDay.from(Integer.valueOf(year), Integer.valueOf(month) - 1, Integer.valueOf(day));
             scheduleArrayList.add(calendarDay);
         }
-        calendar.addDecorator(new EventDecorator(Color.BLUE, scheduleArrayList));
+        eventDecorator = new EventDecorator(Color.BLUE, scheduleArrayList);
+
+        calendar.addDecorator(eventDecorator);
+
     }
 
     public void schedule_db() {
@@ -201,6 +204,10 @@ public class CalendarFragment extends Fragment {
         else if(requestCode == VIEW_REQUEST && resultCode == Activity.RESULT_OK){
             if(intent.getExtras().getInt("state") == 1) {
                 calendarListAdapter.remove(select_list); //일정 삭제하기
+                if(calendarListAdapter.isEmpty()) {
+                    calendar.removeDecorator(eventDecorator);
+                }
+
             }
             else if(intent.getExtras().getInt("state") == 2){
                 String title = intent.getExtras().get("title").toString();
