@@ -21,7 +21,7 @@
         app:iconSpaceReserved="false"
         app:key="pw"
         app:title="비밀번호 설정"
-        app:fragment="com.example.diary.fragment.pwPreferenceFragment"/>
+        app:fragment="com.example.diary.fragment.PWSettingFragment"/>
 
     <PreferenceScreen
         app:iconSpaceReserved="false"

@@ -24,7 +24,6 @@ public class PasswordActivity extends AppCompatActivity {
     EditText password1,password2, password3, password4;
     TextView title;
     private String oldPasscode = null;
-    boolean change_pw = false; //비밀번호 변경 여부
 
     //지문 인식
     private Executor executor;
@@ -81,13 +80,13 @@ public class PasswordActivity extends AppCompatActivity {
 
         AppLock appLock = new AppLock(this);
 
-        if(getIntent().getIntExtra("bio", 0) == AppLockConst.BIO_PASSWORD){
-            setBiometricPrompt(true); //지문 인식
-            setResult(RESULT_OK);
-        }
+//        if(getIntent().getIntExtra("bio", 0) == AppLockConst.BIO_PASSWORD){
+//            setBiometricPrompt(true); //지문 인식
+//            setResult(RESULT_OK);
+//        }
         if(sharedPreferences.getBoolean("biopassword",false) == true
-                && getIntent().getIntExtra("type", 0) == AppLockConst.DISABLE_PASSLOCK){
-            setBiometricPrompt(false);
+                && getIntent().getIntExtra("type",0) != AppLockConst.CHANGE_PASSWORD){
+            setBiometricPrompt();
             setResult(RESULT_OK);
         }
     }
@@ -107,9 +106,9 @@ public class PasswordActivity extends AppCompatActivity {
         AppLock appLock = new AppLock(this);
 
         //잠금 설정이 되어 있으면서 다시 잠금 설정을 할 경우
-        if(type == AppLockConst.ENABLE_PASSLOCK && appLock.isPassLockSet()){
-            type = AppLockConst.CHANGE_PASSWORD;
-        }
+//        if(type == AppLockConst.ENABLE_PASSLOCK && appLock.isPassLockSet()){
+//            type = AppLockConst.CHANGE_PASSWORD;
+//        }
 
         TextView text = findViewById(R.id.again);
         switch (type) {
@@ -142,28 +141,21 @@ public class PasswordActivity extends AppCompatActivity {
                 break;
 
             case AppLockConst.CHANGE_PASSWORD: //비밀 번호 변경
-                if (appLock.checkPassLock(passLock) && !change_pw) {
-                    title.setText("비밀번호 변경");
-                    change_pw = true;
-                }
-                else if(change_pw) {
-                    if (oldPasscode == null) {
-                        oldPasscode = passLock;
-                        clearFields();
-                        text.setVisibility(View.VISIBLE);
-                    } else {
-                        if (passLock.equals(oldPasscode)) {
-                            setResult(RESULT_OK);
-                            appLock.setPassLock(passLock);
-                            finish();
-                        } else {
-                            oldPasscode = null;
-                            text.setVisibility(View.GONE);
-                            onPasscodeError();
-                        }
-                    }
+                title.setText("비밀번호 변경");
+                if (oldPasscode == null) {
+                    oldPasscode = passLock;
+                    clearFields();
+                    text.setVisibility(View.VISIBLE);
                 } else {
-                    onPasscodeError();
+                    if (passLock.equals(oldPasscode)) {
+                        setResult(RESULT_OK);
+                        appLock.setPassLock(passLock);
+                        finish();
+                    } else {
+                        oldPasscode = null;
+                        text.setVisibility(View.GONE);
+                        onPasscodeError();
+                    }
                 }
                 break;
 
@@ -283,7 +275,7 @@ public class PasswordActivity extends AppCompatActivity {
         }
     }
 
-    protected void setBiometricPrompt(final boolean type){
+    protected void setBiometricPrompt(){
         final AppLock appLock = new AppLock(this);
 
         executor = ContextCompat.getMainExecutor(this);
@@ -304,10 +296,7 @@ public class PasswordActivity extends AppCompatActivity {
                 super.onAuthenticationSucceeded(result);
 //                Toast.makeText(getApplicationContext(),
 //                        "성공", Toast.LENGTH_SHORT).show();
-                if(type)
-                    appLock.setBio();
-                else
-                    appLock.removeBio();
+
                 finish();
             }
 
