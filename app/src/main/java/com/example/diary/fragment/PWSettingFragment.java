@@ -1,5 +1,6 @@
 package com.example.diary.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -114,5 +115,34 @@ public class PWSettingFragment extends Fragment {
     public void setPw_state(String pw_state){
         editor.putString("pw_state",pw_state);
         editor.apply(); //저장
+    }
+
+    boolean lock = true; //잠금 상태 확인
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        AppLock appLock = new AppLock(getContext());
+        if(lock && appLock.isPassLockSet()){
+            Intent intent = new Intent(getContext(), PasswordActivity.class);
+            intent.putExtra("type", AppLockConst.UNLOCK_PASSWORD);
+            startActivityForResult(intent, AppLockConst.UNLOCK_PASSWORD);
+        }
+        else if(lock && sharedPreferences.getBoolean("biopassword",false) == true){
+            Intent intent = new Intent(getContext(), PasswordActivity.class);
+            intent.putExtra("bio", AppLockConst.BIO_PASSWORD);
+            startActivityForResult(intent, AppLockConst.BIO_PASSWORD);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == AppLockConst.UNLOCK_PASSWORD && resultCode == Activity.RESULT_OK){
+            lock = false; //잠금 해제
+        }
+        if(requestCode == AppLockConst.BIO_PASSWORD && resultCode == Activity.RESULT_OK){
+            lock = false; //잠금 해제
+        }
     }
 }

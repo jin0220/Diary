@@ -43,4 +43,10 @@
         <item name="android:textSize">20dp</item>
     </style>
 
+    <style name="CustomRadioTheme" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="colorControlNormal">#bbb</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/colorPrimary</item>
+    </style>
+
 </resources>
