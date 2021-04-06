@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -167,11 +166,11 @@ public class MainActivity extends AppCompatActivity
             } else {  // 23 이상
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), pendingIntent); //: set()과 동일하지만 절전모드에서도 동작하는 API입니다.
             }
-            Toast.makeText(this,"모드1" + "알람 설정 완료 " ,Toast.LENGTH_LONG).show();
-            Log.d("확인","모드1" + "알람 설정 완료 " + SystemClock.elapsedRealtime() + 60 * 1000 + " " + System.currentTimeMillis() + 60 * 1000);
+//            Toast.makeText(this,"모드1" + "알람 설정 완료 " ,Toast.LENGTH_LONG).show();
+//            Log.d("확인","모드1" + "알람 설정 완료 " + SystemClock.elapsedRealtime() + 60 * 1000 + " " + System.currentTimeMillis() + 60 * 1000);
         }else if(sharedPreferences.getBoolean("alarm",false) == false){
             alarmManager.cancel(pendingIntent);
-            Toast.makeText(this,"모드2" + "알람 끄기",Toast.LENGTH_LONG).show();
+//            Toast.makeText(this,"모드2" + "알람 끄기",Toast.LENGTH_LONG).show();
 //            Log.d("확인","모드2" + "알람 끄기");
         }
 

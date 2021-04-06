@@ -1,6 +1,8 @@
 package com.example.diary.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -51,7 +53,7 @@ public class CalendarFragment extends Fragment {
     int ADD_REQUEST = 1;
     int VIEW_REQUEST = 2;
     int select_list;
-
+    EventDecorator eventDecorator;
 
     @Nullable
     @Override
@@ -136,7 +138,33 @@ public class CalendarFragment extends Fragment {
             }
         });
 
-        SlidingUpPanelLayout slidingUpPanelLayout = rootView.findViewById(R.id.slidinguppanel);
+        schedule_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String items[] = {"삭제", "수정"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                builder.setTitle("선택 목록").setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int itemIndex) {
+
+                    }
+                });
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                return true;
+            }
+        });
+
+        final SlidingUpPanelLayout slidingUpPanelLayout = rootView.findViewById(R.id.slidinguppanel);
+        slidingUpPanelLayout.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED); //패널 외부를 클릭하면 패널이 숨겨짐.
+            }
+        });
         slidingUpPanelLayout.setDragView(rootView.findViewById(R.id.schedule)); //패널 열기위해 드래그하는 위치
 
         floatingActionButton = rootView.findViewById(R.id.floatingActionButton);
@@ -153,7 +181,9 @@ public class CalendarFragment extends Fragment {
         return rootView;
 
     }
-    EventDecorator eventDecorator;
+
+
+
     public void schedule_dot(){
         Cursor cursor3 = diaryDBHelper.select_sql("select * from schedule_table");
         ArrayList<CalendarDay> scheduleArrayList = new ArrayList<>();
@@ -171,7 +201,6 @@ public class CalendarFragment extends Fragment {
         eventDecorator = new EventDecorator(Color.BLUE, scheduleArrayList);
 
         calendar.addDecorator(eventDecorator);
-
     }
 
     public void schedule_db() {
@@ -192,6 +221,14 @@ public class CalendarFragment extends Fragment {
         }
     }
 
+    public void schedule_remove(){
+        calendarListAdapter.remove(select_list); //일정 삭제하기
+        if(calendarListAdapter.isEmpty()) {
+            calendar.removeDecorator(eventDecorator); //처음 그려졌던 dot을 없애고
+            schedule_dot(); //새로운 dot을 그림.
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
         if(requestCode == ADD_REQUEST && resultCode == Activity.RESULT_OK){
@@ -199,15 +236,12 @@ public class CalendarFragment extends Fragment {
             String time = intent.getExtras().get("time").toString();
             calendarListAdapter.addData(title, time);
             calendarListAdapter.notifyDataSetChanged(); //리스트뷰 갱신
-            schedule_dot();
+            if(calendarListAdapter.getCount() == 1)
+                schedule_dot(); //일정이 없는 날 일정이 하나가 생성되면 dot 그림.
         }
         else if(requestCode == VIEW_REQUEST && resultCode == Activity.RESULT_OK){
             if(intent.getExtras().getInt("state") == 1) {
-                calendarListAdapter.remove(select_list); //일정 삭제하기
-                if(calendarListAdapter.isEmpty()) {
-                    calendar.removeDecorator(eventDecorator);
-                }
-
+                schedule_remove();
             }
             else if(intent.getExtras().getInt("state") == 2){
                 String title = intent.getExtras().get("title").toString();
