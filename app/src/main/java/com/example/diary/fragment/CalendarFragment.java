@@ -141,12 +141,18 @@ public class CalendarFragment extends Fragment {
         schedule_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                final TextView title = view.findViewById(R.id.schedule_title);
                 String items[] = {"삭제", "수정"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
                 builder.setTitle("선택 목록").setItems(items, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int itemIndex) {
+                        if(itemIndex == 0) {
+                            String sql = "delete from " + diaryDBHelper.TABLE_SCHEDULE + " where start_date like " + "'" + click_date + "%' and title = '" + title.getText() + "'";
+                            schedule_remove();
+                        }
+//                        else if(itemIndex == 1)
 
                     }
                 });
